@@ -1,0 +1,9 @@
+Metadata-Version: 2.4
+Name: haic-logging
+Version: 0.1.0
+Summary: Event logging and artifact export for Human-AI Collaboration (HAIC)
+Author: George Fragiadakis
+License: MIT
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
+Requires-Dist: psutil>=5.9
