@@ -16,7 +16,7 @@ and methodological clarity.
 - (anticipated minor behavior/compat improvements; populate when releasing)
 
 ---
-## [0.1.0] – 2026-01-24
+## [v0.1.0] – 2026-01-24
 
 ### Added
 
