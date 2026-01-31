@@ -7,13 +7,28 @@ for libraries (`MAJOR.MINOR.PATCH`), with early versions focusing on API stabili
 and methodological clarity.
 
 ---
-## [v0.1.1] – TBD
+## [v0.1.1] – 2026-02-01
 
-### Fixed
-- (anticipated small fixes; populate when releasing)
+### Added
+- Time-windowed evaluation support for metrics computation.
+  - Relative windows (offsets from session start).
+  - Absolute windows (ISO 8601 UTC timestamps).
+  - Automatic fallback to earliest event timestamp when session start metadata is missing.
+- Window summary metadata included in all metric outputs (requested vs effective window, counts).
+- Markdown reporting module with structured, self-describing evaluation reports.
+- Golden-report tests ensuring reporting stability and reproducibility guarantees.
+- Timezone-aware UTC timestamps in generated reports.
 
 ### Changed
-- (anticipated minor behavior/compat improvements; populate when releasing)
+- `compute_metrics` now accepts an optional `window` argument to restrict evaluation scope.
+- Metrics are computed strictly on window-filtered decisions/events.
+- Reporting output explicitly discloses evaluation window and versions used.
+- Internal timestamp handling standardized to epoch seconds + ISO 8601 UTC.
+
+### Fixed
+- Clarified separation between logging artifacts and metric computation inputs.
+- Improved robustness when session-level timestamps are partially missing.
+- Removed reliance on naive UTC timestamps (`datetime.utcnow`).
 
 ---
 ## [v0.1.0] – 2026-01-24
