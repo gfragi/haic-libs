@@ -58,6 +58,56 @@ result = compute_metrics(artifact, profile="core")
 
 print(result["metrics"])
 ```
+---
+## Time-windowed evaluation
+
+HAIC metrics can be computed over a specific temporal window of a session.
+This allows developers and researchers to evaluate only the relevant portion
+of an interaction (e.g., after model warm-up, during adaptation phases, or
+within fixed experimental intervals).
+
+Two windowing modes are supported:
+
+- **Relative window** (offset from session start, in seconds)
+- **Absolute window** (ISO 8601 UTC timestamps)
+
+If session-level timestamps are missing, the evaluator automatically falls
+back to the earliest recorded event timestamp.
+
+### Example
+
+```python
+from haic_metrics import compute_metrics
+
+result = compute_metrics(
+    artifact,
+    window={
+        "basis": "relative",
+        "start": 0,
+        "end": 120,
+    }
+)
+
+print(result["metrics"])
+print(result["window_summary"])
+```
+
+The evaluation report always discloses the requested and effective window used for metric computation. This is **high signal**, low maintenance.
+
+---
+
+## Reporting
+
+The library includes a structured Markdown reporting module that generates
+self-describing evaluation reports, including:
+
+- Evaluation window disclosure
+- Metric summaries
+- Diagnostics and warnings
+- Reproducibility metadata (versions, timestamps)
+
+Reports are designed for both experimental analysis and pilot documentation.
+
 
 ## Evaluation Profiles
 
