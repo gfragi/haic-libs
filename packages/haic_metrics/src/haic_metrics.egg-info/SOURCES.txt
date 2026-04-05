@@ -8,7 +8,10 @@ src/haic_metrics/io.py
 src/haic_metrics/latency.py
 src/haic_metrics/outcome_metrics.py
 src/haic_metrics/validators.py
+src/haic_metrics/windowing.py
 src/haic_metrics.egg-info/PKG-INFO
 src/haic_metrics.egg-info/SOURCES.txt
 src/haic_metrics.egg-info/dependency_links.txt
 src/haic_metrics.egg-info/top_level.txt
+src/haic_metrics/reporting/md.py
+src/haic_metrics/reporting/templates.py
