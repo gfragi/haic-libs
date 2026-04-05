@@ -85,30 +85,49 @@ The libraries themselves remain platform-independent.
 - Extended tooling (e.g., onboarding wizards) builds on top of these libraries
 
 ---
-## Short onboarding example
+
+## Quick start — one-liner report
+
+```python
+import haic_metrics
+
+print(haic_metrics.report("haic_decisions_xxx.json"))
+```
+
+`report()` loads the artifact, computes all core KPIs, and returns a
+ready-to-print Markdown evaluation report.
+
+---
+
+## Onboarding example — full pipeline
 
 ```python
 from haic_logging import HaicLogger
-from haic_metrics import compute_metrics
-from haic_metrics.io import load_decisions_artifact
+import haic_metrics
 
 with HaicLogger(log_dir="./logs", pilot_tag="pilot-x", app_name="my_app", app_version="0.1.0") as hl:
     hl.log_decision(actor_type="human", action="label_received", object_id="item_1", duration_s=2.1, correct=True)
     hl.log_decision(actor_type="ai", action="ai_evaluated", object_id="item_1", latency_ms=95)
     artifact_path = hl.export_decisions_artifact()
 
-artifact = load_decisions_artifact(artifact_path)
-report = compute_metrics(artifact, profile="core")
-print(report["metrics"])
+# One-liner: load → compute → render
+print(haic_metrics.report(artifact_path))
+```
 
+To get raw metrics instead of a report:
+
+```python
+from haic_metrics import compute_metrics_from_file
+
+result = compute_metrics_from_file(artifact_path, profile="core")
+print(result["metrics"])
 ```
 
 ## Minimal onboarding example (decisions-only logging)
 
-
 ```python
 from haic_logging import HaicLogger
-from haic_metrics import compute_metrics
+import haic_metrics
 
 with HaicLogger(log_dir="./logs", pilot_tag="pilot-minimal") as hl:
     hl.log_decision(
@@ -126,10 +145,28 @@ with HaicLogger(log_dir="./logs", pilot_tag="pilot-minimal") as hl:
     )
     artifact_path = hl.export_decisions_artifact()
 
-report = compute_metrics(artifact_path, profile="core")
-print(report["metrics"])
-
+print(haic_metrics.report(artifact_path))
 ```
+
+---
+
+## haic-metrics API reference (top-level)
+
+| Function | Description |
+| --- | --- |
+| `haic_metrics.report(path, *, profile, **kw)` | Full pipeline: load → compute → render Markdown report |
+| `haic_metrics.compute_metrics(artifact, *, profile, baseline_s, window)` | Compute KPIs from a loaded artifact dict or decisions list |
+| `haic_metrics.compute_metrics_from_file(path, *, profile, baseline_s, window)` | Load artifact from file and compute KPIs |
+| `haic_metrics.render_markdown_report(*, result, artifact, ...)` | Render a Markdown report from a pre-computed result dict |
+
+Key `compute_metrics` behaviours:
+
+- **EL baseline**: auto-derived as P95 of human `duration_s` when `baseline_s=None`;
+  a warning is added if fewer than 3 observations are available.
+- **Tr**: returns `None` (not `1.0`) when no decisions carry a `correct` label,
+  making the metric's absence explicit. A `Tr_note` key explains the status.
+- **Windowing**: pass `window={"basis": "relative", "last": 120}` to restrict
+  evaluation to the last 120 seconds of a session.
 
 ---
 

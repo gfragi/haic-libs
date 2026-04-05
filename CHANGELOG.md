@@ -6,6 +6,20 @@ This project follows a versioning scheme compatible with Semantic Versioning
 for libraries (`MAJOR.MINOR.PATCH`), with early versions focusing on API stability
 and methodological clarity.
 
+## Release process
+
+To cut a new release:
+
+1. Move all items from `## [Unreleased] → ### Added / Changed / Fixed` into a new
+   `## [vX.Y.Z] – YYYY-MM-DD` section above the previous release.
+2. Bump `version` in `packages/haic_metrics/pyproject.toml`
+   (and `packages/haic_logging/pyproject.toml` if `haic-logging` changed).
+3. Update the footer reference links at the bottom of this file:
+   - `[Unreleased]` → compare from the new tag to HEAD
+   - Add `[vX.Y.Z]` → release tag URL
+4. Commit: `git commit -m "chore: release vX.Y.Z"`
+5. Tag and push: `git tag vX.Y.Z && git push origin main --tags`
+
 ---
 ## [v0.1.1] – 2026-02-01
 
@@ -77,7 +91,39 @@ and methodological clarity.
 
 ---
 
-## [Unreleased]
+## [0.1.2] – 2026-04-05
+
+### Added
+
+- `compute_metrics_from_file(path, *, profile, baseline_s, window)` in `io.py` — loads a
+  decisions artifact and computes metrics in a single call.
+- `report(artifact_path, *, profile, **kw)` convenience function in `__init__.py` — runs the
+  full load → compute → render pipeline; returns a ready-to-print Markdown string.
+- `render_markdown_report` exported from the top-level package (`haic_metrics`).
+- `__version__` attribute derived at import time via `importlib.metadata`; falls back to
+  `"unknown"` when the package is not installed from a distribution.
+- `Tr_note` key added to the metrics output dict:
+  - `"proxy based on available labels"` when labeled decisions exist.
+  - `"no labeled decisions; Tr not computable"` when none exist (`Tr` is then `None`).
+- `render_markdown_report()` now derives and substitutes decision-level diagnostic fields
+  directly from the artifact's decisions list: `rt_max_s`, `diag.has_timestamps`,
+  `diag.has_durations`, `diag.n_human`, `diag.n_ai`.
+
+### Changed
+
+- `compute_metrics()` auto-derives `baseline_s` as the **P95 of human `duration_s`** values
+  within the evaluation window when `baseline_s=None` (previous behavior: EL was always 0).
+  If fewer than 3 qualifying observations exist, `EL` stays `0` and a warning is emitted:
+  `"EL baseline not computable: insufficient human duration observations (n<3)."`.
+- `Tr` is now `None` (not `1.0`) when no decisions carry a `correct` label or `error` event,
+  making the metric's absence explicit rather than silently optimistic.
+- Markdown report template: metric D label updated from `"D (diversity)"` to
+  `"D (mean action duration)"` to match the actual computation.
+- Markdown report template: F notes column updated from `"interactions per time window"` to
+  `"interactions per minute"` to match the unit used in the formula.
+- Markdown report template: Tr notes column now renders `{{ metrics.Tr_note }}` dynamically
+  instead of a static string.
+- `repl()` in `md.py` now renders `None` values as `"n/a"` in all report fields.
 
 ### Planned
 - Additional metric profiles and extensions.
@@ -85,6 +131,6 @@ and methodological clarity.
 - Improved documentation and examples based on pilot feedback.
 - Visualization helpers (kept outside the core libraries).
 
-[Unreleased]: https://github.com/gfragi/haic-libs.git/compare/v0.1.0...HEAD
-[v0.1.1]: https://github.com/gfragi/haic-libs.git/releases/tag/v0.1.0...v0.1.1
+[0.1.2]: https://github.com/gfragi/haic-libs.git/compare/v0.1.0...v0.1.2
+[v0.1.1]: https://github.com/gfragi/haic-libs.git/releases/tag/v0.1.1
 [v0.1.0]: https://github.com/gfragi/haic-libs.git/releases/tag/v0.1.0
