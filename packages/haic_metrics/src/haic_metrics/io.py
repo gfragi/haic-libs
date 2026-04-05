@@ -40,6 +40,18 @@ def load_decisions_artifact(path: Union[str, Path]) -> JsonDict:
     return obj
 
 
+def compute_metrics_from_file(
+    path: Union[str, Path],
+    *,
+    profile: str = "core",
+    baseline_s=None,
+    window=None,
+) -> JsonDict:
+    artifact = load_decisions_artifact(path)
+    from haic_metrics.compute import compute_metrics
+    return compute_metrics(artifact, profile=profile, baseline_s=baseline_s, window=window)
+
+
 def extract_decisions(obj: Union[JsonDict, List[JsonDict]]) -> List[JsonDict]:
     """
     Accept either:
