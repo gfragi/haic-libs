@@ -56,10 +56,9 @@ def compute_metrics(
     baseline_s:
       If None (default), auto-derived as the P95 of human decision duration_s values
       within the evaluation window (decisions where actor_type="human" and duration_s
-      is not None), but only when at least 10 such observations are available.
-      If fewer than 10 exist, EL is set to None and a warning is added:
-      "EL baseline not reliable: fewer than 10 human duration observations in
-      session (n=X)." Pass an explicit baseline_s to override this guard.
+      is not None). If fewer than 3 such observations exist, EL is left at 0 and a
+      warning is added: "EL baseline not computable: insufficient human duration
+      observations (n<3)."
     """
     decisions = extract_decisions(decisions_or_artifact)
 
@@ -83,14 +82,13 @@ def compute_metrics(
             for d in decisions_f
             if d.get("actor_type") == "human" and d.get("duration_s") is not None
         ]
-        if len(human_durs) >= 10:
+        if len(human_durs) >= 3:
             baseline_s = statistics.quantiles(human_durs, n=100)[94]  # index 94 = P95
         else:
             warnings.append(
-                f"EL baseline not reliable: fewer than 10 human duration observations "
-                f"in session (n={len(human_durs)})."
+                "EL baseline not computable: insufficient human duration observations (n<3)."
             )
-            # baseline_s stays None → EL will be None
+            # baseline_s stays None → EL will remain 0
 
     metrics: JsonDict = {}
 

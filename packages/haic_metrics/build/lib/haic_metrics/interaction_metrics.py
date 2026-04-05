@@ -360,11 +360,10 @@ def compute_metrics(
     if baseline_s is not None and baseline_s > 0 and total_time > 0:
         EL = max(0.0, (total_time - baseline_s) / baseline_s)
     else:
-        EL = None
+        EL = 0.0
 
-    # Base efficiency from EL only; treat missing EL as neutral (0) for the composite
-    el_for_score = EL if EL is not None else 0.0
-    EfficiencyScore = 1.0 / (1.0 + el_for_score)
+    # Base efficiency from EL only
+    EfficiencyScore = 1.0 / (1.0 + float(EL)) if EL >= 0 else 1.0
 
     # ---- Gentle shaping with off-role and progress signals (if present) ----
     def _count_pred(rows: List[Dict[str, Any]], pred: Callable[[Dict[str, Any]], bool]) -> int:
@@ -388,7 +387,7 @@ def compute_metrics(
         "Tr_note": Tr_note,
         "A": float(A),
         "S": float(S),
-        "EL": None if EL is None else float(EL),
+        "EL": float(EL),
         "EfficiencyScore": float(EfficiencyScore),
     }
 
