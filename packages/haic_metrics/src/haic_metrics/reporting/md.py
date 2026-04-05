@@ -43,6 +43,20 @@ def render_markdown_report(
     for k, v in metrics.items():
         repl(f"{{{{ metrics.{k} }}}}", v)
 
+    rt_max_s = result.get("rt_max_s", 60.0)
+    repl("{{ rt_max_s }}", rt_max_s)
+
+    decisions = artifact.get("decisions", [])
+    has_timestamps = any(isinstance(d.get("t"), (int, float)) for d in decisions)
+    has_durations = any(d.get("duration_s") is not None for d in decisions)
+    n_human = sum(1 for d in decisions if d.get("actor_type") == "human")
+    n_ai = sum(1 for d in decisions if d.get("actor_type") == "ai")
+
+    repl("{{ diag.has_timestamps }}", has_timestamps)
+    repl("{{ diag.has_durations }}", has_durations)
+    repl("{{ diag.n_human }}", n_human)
+    repl("{{ diag.n_ai }}", n_ai)
+
     repl("{{ artifact_path }}", artifact_path)
     repl("{{ version_metrics }}", version_metrics)
     repl("{{ version_logging }}", version_logging)

@@ -27,8 +27,8 @@ REPORT_MD_TEMPLATE = """# HAIC Evaluation Report
 ## Metrics summary
 | Category | Metric | Value | Notes |
 |---|---:|---:|---|
-| Interaction | F (frequency) | {{ metrics.F }} | interactions per time window |
-| Interaction | D (diversity) | {{ metrics.D }} | action variety proxy |
+| Interaction | F (frequency) | {{ metrics.F }} | interactions per minute |
+| Interaction | D (mean action duration) | {{ metrics.D }} | action variety proxy |
 | Human-centeredness | HCL | {{ metrics.HCL }} | normalized (rt_max={{ rt_max_s }}s) |
 | Trust | Tr | {{ metrics.Tr }} | proxy based on available labels |
 | Adaptability | A | {{ metrics.A }} | trend-based proxy |
