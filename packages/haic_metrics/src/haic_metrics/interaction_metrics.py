@@ -313,7 +313,12 @@ def compute_metrics(
         if str(e.get("event_type", "")).lower() == "error":
             labeled += 1
             errors += 1
-    Tr = _clip01(1.0 - (errors / labeled if labeled > 0 else 0.0))
+    if labeled == 0:
+        Tr = None
+        Tr_note = "no labeled decisions; Tr not computable"
+    else:
+        Tr = _clip01(1.0 - errors / labeled)
+        Tr_note = "proxy based on available labels"
 
     # 5) A: adaptability on agent rows; clamp to [-1, 1] via tanh
     if N_agents > 0:
@@ -378,7 +383,8 @@ def compute_metrics(
         "F": float(F),
         "D": float(D),
         "HCL": float(HCL),
-        "Tr": float(Tr),
+        "Tr": None if Tr is None else float(Tr),
+        "Tr_note": Tr_note,
         "A": float(A),
         "S": float(S),
         "EL": float(EL),

@@ -1,4 +1,5 @@
 from __future__ import annotations
+import statistics
 from typing import Any, Dict, List, Union, Optional, Literal, TypedDict
 
 from .io import extract_decisions
@@ -51,6 +52,13 @@ def compute_metrics(
       - window={"basis":"relative","last":120}           -> last 120 seconds of session
       - window={"basis":"absolute","start":<epoch>,"end":<epoch>} -> epoch seconds
       - window={"basis":"absolute","start":<iso>,"end":<iso>}     -> ISO timestamps
+
+    baseline_s:
+      If None (default), auto-derived as the P95 of human decision duration_s values
+      within the evaluation window (decisions where actor_type="human" and duration_s
+      is not None). If fewer than 3 such observations exist, EL is left at 0 and a
+      warning is added: "EL baseline not computable: insufficient human duration
+      observations (n<3)."
     """
     decisions = extract_decisions(decisions_or_artifact)
 
@@ -66,6 +74,21 @@ def compute_metrics(
         window=window,
     )
     # events_f currently not used by metric calculators; kept for reporting/diagnostics.
+
+    # Auto-derive baseline_s as P95 of human duration_s if not explicitly provided.
+    if baseline_s is None:
+        human_durs = [
+            float(d["duration_s"])
+            for d in decisions_f
+            if d.get("actor_type") == "human" and d.get("duration_s") is not None
+        ]
+        if len(human_durs) >= 3:
+            baseline_s = statistics.quantiles(human_durs, n=100)[94]  # index 94 = P95
+        else:
+            warnings.append(
+                "EL baseline not computable: insufficient human duration observations (n<3)."
+            )
+            # baseline_s stays None → EL will remain 0
 
     metrics: JsonDict = {}
 

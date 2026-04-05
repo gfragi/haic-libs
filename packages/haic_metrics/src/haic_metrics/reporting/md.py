@@ -15,14 +15,13 @@ def render_markdown_report(
     warnings = result.get("warnings", [])
 
     meta = artifact.get("meta", {})
-    ts = meta.get("timestamps", {})
 
     # Simple replacements (no templating engine needed yet)
     md = REPORT_MD_TEMPLATE
 
     def repl(key, value):
         nonlocal md
-        md = md.replace(key, str(value))
+        md = md.replace(key, "n/a" if value is None else str(value))
 
     repl("{{ run_id }}", meta.get("run_id", "n/a"))
     repl("{{ session_id }}", meta.get("session_id", "n/a"))
