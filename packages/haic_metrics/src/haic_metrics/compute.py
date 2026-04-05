@@ -15,7 +15,7 @@ def compute_metrics(
     decisions_or_artifact: Union[JsonDict, List[JsonDict]],
     *,
     profile: str = "core",
-    rt_max_s: float = 5.0,
+    rt_max_s: float = 60.0,
     baseline_s: float | None = None,
     include_warnings: bool = True,
 ) -> JsonDict:

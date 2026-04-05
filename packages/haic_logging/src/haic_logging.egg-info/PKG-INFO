@@ -7,3 +7,155 @@ License: MIT
 Requires-Python: >=3.10
 Description-Content-Type: text/markdown
 Requires-Dist: psutil>=5.9
+
+# haic-logging
+
+`haic-logging` is a lightweight, application-agnostic logging library for
+Human–AI Collaboration (HAIC) systems.
+
+It provides a **standardized instrumentation layer** that captures:
+1. A fine-grained **event stream** (for traceability and debugging), and
+2. A compact **decisions artifact** that serves as the stable input contract
+   for HAIC evaluation metrics.
+
+The library is intentionally decoupled from any UI, database, or platform.
+Application-specific logic (e.g., radiology workflows, databases) is expected
+to live outside the library as adapters.
+
+---
+
+## Design Principles
+
+- **Separation of concerns**  
+  Logging is independent from evaluation and storage backends.
+
+- **Minimal contract, maximal reuse**  
+  Only a small set of fields is required to unlock core evaluation.
+
+- **Pilot-friendly**  
+  Missing or partial fields are tolerated; richer logs unlock richer metrics.
+
+---
+
+## Installation
+
+```bash
+pip install haic-logging
+```
+
+## Core Concepts
+
+### Events
+
+Events are fine-grained interaction records intended for traceability.
+
+Examples:
+- `session_start`
+- `task_item_loaded`
+- `ai_suggestion_presented`
+- `human_decision`
+- `session_end`
+
+Events are written as an append-only JSONL stream.
+
+### Decisions
+
+Decisions are metric-oriented interaction records.
+They are compact, stable, and designed to be consumed by haic-metrics.
+
+A decision minimally includes:
+- `actor_type`: "human" | "ai" | "system"
+- `action`: controlled vocabulary (e.g. label_received, ai_evaluated)
+- `object_id`: unit of work (e.g. image ID)
+- `t`: timestamp
+
+Optional fields:
+- `duration_s`
+- `latency_ms`
+- `correct`
+- `payload`
+
+## Quickstart
+
+```python
+from haic_logging import HaicLogger
+
+with HaicLogger(
+    log_dir="./logs",
+    pilot_tag="radiology-toy",
+    app_name="annotation_tool",
+    app_version="0.1.0",
+    app_mode="labelling",
+    model_name="baseline_detector",
+    model_version="v0",
+) as logger:
+
+    logger.log_decision(
+        actor_type="human",
+        action="label_received",
+        object_id="img_001",
+        duration_s=2.3,
+        correct=True,
+    )
+
+    logger.log_decision(
+        actor_type="ai",
+        action="ai_evaluated",
+        object_id="img_001",
+        latency_ms=120,
+    )
+
+    artifact_path = logger.export_decisions_artifact()
+```
+
+This produces:
+- `run_<run_id>.jsonl` (events)
+- `haic_decisions_<run_id>.json` (decisions artifact)
+
+## Decisions Artifact Schema (Simplified)
+
+```json
+{
+  "schema_version": "haic.decisions.v1",
+  "session_id": "...",
+  "run_id": "...",
+  "meta": { ... },
+  "decisions": [
+    {
+      "t": 1234567890.12,
+      "actor_type": "human",
+      "action": "label_received",
+      "object_id": "img_001",
+      "duration_s": 2.3,
+      "correct": true
+    }
+  ]
+}
+```
+
+This artifact is the formal interface to the evaluation engine.
+
+## What This Library Does NOT Do
+
+- It does not write to databases
+- It does not enforce domain semantics
+- It does not compute metrics
+
+Those responsibilities belong to adapters and to haic-metrics.
+
+## Intended Usage Pattern
+
+```
+Application
+   └── haic-logging
+         ├── events.jsonl   (trace/debug)
+         └── decisions.json (evaluation contract)
+```
+
+## License
+
+MIT
+
+
+---
+

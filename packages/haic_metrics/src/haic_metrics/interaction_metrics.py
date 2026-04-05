@@ -3,7 +3,7 @@ from typing import List, Dict, Any, Optional, Callable
 import math
 import datetime as dt
 
-DEFAULT_RT_MAX = 5.0   # seconds
+DEFAULT_RT_MAX = 60.0   # seconds
 DEFAULT_BASELINE_S = None
 
 # Soft weights for composite EfficiencyScore shaping
@@ -142,26 +142,49 @@ def _only_agent_rows(decisions: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
 
 def _total_time(decisions: List[Dict[str, Any]], explicit_T: Optional[float]) -> float:
     """
-    Prefer explicit_T; else use t-range; else fallback to timestamp range (if present).
+    Prefer explicit_T; else use max(t-span, sum(durations), timestamp span).
+    Always returns a robust non-negative estimate.
     """
     if explicit_T is not None:
         return float(explicit_T)
+
     if not decisions:
         return 0.0
-    # Try t-range
+
+    # 1) t-range span
+    span_t = 0.0
     try:
         t0 = float(min(e.get("t", 0.0) for e in decisions))
         tN = float(max(e.get("t", 0.0) for e in decisions))
-        span = max(0.0, tN - t0)
-        if span > 0:
-            return span
+        span_t = max(0.0, tN - t0)
     except Exception:
-        pass
-    # Fallback: timestamp range (if normalization left _timestamp_dt)
+        span_t = 0.0
+
+    # 2) sum of observed durations (very important for fast simulations & bursty logs)
+    dur_sum = 0.0
+    for e in decisions:
+        ds = e.get("duration_s")
+        if isinstance(ds, (int, float)) and ds is not None:
+            dur_sum += float(ds)
+            continue
+        ms = e.get("latency_ms")
+        if isinstance(ms, (int, float)) and ms is not None:
+            dur_sum += float(ms) / 1000.0
+
+    # 3) timestamp span fallback
+    span_ts = 0.0
     ts_vals = [e.get("_timestamp_dt") for e in decisions if e.get("_timestamp_dt") is not None]
     if ts_vals:
-        return max(0.0, _sec(min(ts_vals), max(ts_vals)))
-    return 0.0
+        span_ts = max(0.0, _sec(min(ts_vals), max(ts_vals)))
+
+    # robust window estimate
+    total = max(span_t, dur_sum, span_ts)
+
+    # if there are decisions but time is still ~0, clamp to 1 second to avoid exploding F
+    if total <= 0.0 and len(decisions) > 0:
+        total = 1.0
+
+    return total
 
 def _durations(decisions: List[Dict[str, Any]]) -> List[float]:
     # Prefer explicit duration_s, fallback to latency_ms (sec)
