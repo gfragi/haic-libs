@@ -91,7 +91,7 @@ To cut a new release:
 
 ---
 
-## [0.1.2] – 2026-04-05
+## [0.2.0] – 2026-04-05
 
 ### Added
 
@@ -131,6 +131,7 @@ To cut a new release:
 - Improved documentation and examples based on pilot feedback.
 - Visualization helpers (kept outside the core libraries).
 
+[0.2.0]: https://github.com/gfragi/haic-libs.git/compare/v0.1.2...v0.2.0
 [0.1.2]: https://github.com/gfragi/haic-libs.git/compare/v0.1.0...v0.1.2
 [v0.1.1]: https://github.com/gfragi/haic-libs.git/releases/tag/v0.1.1
 [v0.1.0]: https://github.com/gfragi/haic-libs.git/releases/tag/v0.1.0
