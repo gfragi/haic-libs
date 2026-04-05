@@ -129,8 +129,16 @@ with HaicLogger(log_dir="./logs", pilot_tag="pilot-minimal") as hl:
 report = compute_metrics(artifact_path, profile="core")
 print(report["metrics"])
 
-
 ```
+
+---
+
+## References for the packages & more information
+
+- [haic-logging README](packages/haic_logging/README.md)
+- [haic-metrics README](packages/haic_metrics/README.md)
+- [HAIC Metrics Catalog](packages/haic_metrics/docs/metrics_catalog.md)
+
 
 ## License
 
