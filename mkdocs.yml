@@ -1,0 +1,38 @@
+site_name: haic-libs
+site_url: https://gfragi.github.io/haic-libs
+repo_url: https://github.com/gfragi/haic-libs
+repo_name: gfragi/haic-libs
+
+theme:
+  name: material
+  palette:
+    - scheme: default
+      primary: indigo
+      accent: indigo
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - content.code.copy
+
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          paths:
+            - packages/haic_logging/src
+            - packages/haic_metrics/src
+
+nav:
+  - Home: index.md
+  - Concepts: concepts.md
+  - Metrics: metrics.md
+  - Integration guide: integration.md
+  - API reference: api.md
+
+markdown_extensions:
+  - admonition
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - tables
