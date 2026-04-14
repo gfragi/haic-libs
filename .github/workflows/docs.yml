@@ -15,6 +15,7 @@ jobs:
         with:
           python-version: '3.11'
       - run: pip install mkdocs-material mkdocstrings[python]
+      - run: pip install -e packages/haic_logging -e packages/haic_metrics
       - run: mkdocs build
       - uses: peaceiris/actions-gh-pages@v4
         with:
