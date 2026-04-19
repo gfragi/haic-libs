@@ -6,6 +6,8 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
+        <meta name="description" content="Open-source Python library for Human-AI Collaboration evaluation">
+      
       
       
         <link rel="canonical" href="https://gfragi.github.io/haic-libs/metrics/">
@@ -125,7 +127,21 @@
     
     
     
-    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-hidden="true"  type="radio" name="__palette" id="__palette_0">
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
     
   
 </form>
@@ -749,12 +765,12 @@
   
 
 
-<h1 id="metrics">Metrics</h1>
+<h1 id="metrics">Metrics<a class="headerlink" href="#metrics" title="Permanent link">&para;</a></h1>
 <p><code>haic-metrics</code> computes KPIs at two levels of detail controlled by the <code>profile</code> argument. The <strong>core</strong> profile is always available from minimal decision logs. The <strong>full</strong> profile adds outcome-based measures that require explicit labels or ground-truth fields.</p>
 <div class="tabbed-set tabbed-alternate" data-tabs="1:2"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">Core profile</label><label for="__tabbed_1_2">Extended profile (full)</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
-<h2 id="interaction-dynamics">Interaction Dynamics</h2>
+<h2 id="interaction-dynamics">Interaction Dynamics<a class="headerlink" href="#interaction-dynamics" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
 <tr>
@@ -810,7 +826,7 @@
 </tr>
 </tbody>
 </table>
-<h2 id="human-effort-responsiveness">Human Effort &amp; Responsiveness</h2>
+<h2 id="human-effort-responsiveness">Human Effort &amp; Responsiveness<a class="headerlink" href="#human-effort-responsiveness" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
 <tr>
@@ -845,7 +861,7 @@
 </tr>
 </tbody>
 </table>
-<h2 id="ai-performance-latency">AI Performance &amp; Latency</h2>
+<h2 id="ai-performance-latency">AI Performance &amp; Latency<a class="headerlink" href="#ai-performance-latency" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
 <tr>
@@ -880,7 +896,7 @@
 </tr>
 </tbody>
 </table>
-<h2 id="collaboration-adaptation">Collaboration &amp; Adaptation</h2>
+<h2 id="collaboration-adaptation">Collaboration &amp; Adaptation<a class="headerlink" href="#collaboration-adaptation" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
 <tr>
@@ -911,7 +927,7 @@
 </div>
 <div class="tabbed-block">
 <p>All core metrics plus the following, computed when sufficient labels are present:</p>
-<h2 id="outcome-quality">Outcome &amp; Quality</h2>
+<h2 id="outcome-quality">Outcome &amp; Quality<a class="headerlink" href="#outcome-quality" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
 <tr>
@@ -960,7 +976,7 @@
 </tr>
 </tbody>
 </table>
-<h2 id="trust-safety-robustness">Trust, Safety &amp; Robustness</h2>
+<h2 id="trust-safety-robustness">Trust, Safety &amp; Robustness<a class="headerlink" href="#trust-safety-robustness" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
 <tr>
@@ -1009,14 +1025,14 @@
 </div>
 </div>
 </div>
-<h2 id="el-baseline">EL baseline</h2>
+<h2 id="el-baseline">EL baseline<a class="headerlink" href="#el-baseline" title="Permanent link">&para;</a></h2>
 <p><code>EL</code> compares mean human <code>duration_s</code> against a baseline. When <code>baseline_s=None</code> (the default), the baseline is auto-derived as the <strong>P95 of human <code>duration_s</code></strong> within the artifact. A warning is added to the report if fewer than 3 human observations are present.</p>
-<h2 id="windowed-evaluation">Windowed evaluation</h2>
+<h2 id="windowed-evaluation">Windowed evaluation<a class="headerlink" href="#windowed-evaluation" title="Permanent link">&para;</a></h2>
 <p>All metrics can be computed over a temporal sub-window of a session:</p>
-<div class="highlight"><pre><span></span><code><span class="n">result</span> <span class="o">=</span> <span class="n">compute_metrics</span><span class="p">(</span>
-    <span class="n">artifact</span><span class="p">,</span>
-    <span class="n">window</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;basis&quot;</span><span class="p">:</span> <span class="s2">&quot;relative&quot;</span><span class="p">,</span> <span class="s2">&quot;start&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;end&quot;</span><span class="p">:</span> <span class="mi">120</span><span class="p">},</span>
-<span class="p">)</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">result</span> <span class="o">=</span> <span class="n">compute_metrics</span><span class="p">(</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">artifact</span><span class="p">,</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">window</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;basis&quot;</span><span class="p">:</span> <span class="s2">&quot;relative&quot;</span><span class="p">,</span> <span class="s2">&quot;start&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;end&quot;</span><span class="p">:</span> <span class="mi">120</span><span class="p">},</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="p">)</span>
 </code></pre></div>
 <p>Two modes are supported: <code>"relative"</code> (seconds from session start) and <code>"absolute"</code> (ISO 8601 UTC timestamps). The evaluation report always discloses the effective window used.</p>
 
@@ -1039,6 +1055,12 @@
 <script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
         </div>
         
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
       </main>
       
         <footer class="md-footer">
@@ -1046,6 +1068,10 @@
   <div class="md-footer-meta md-typeset">
     <div class="md-footer-meta__inner md-grid">
       <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      MIT License — HumAIne Horizon Europe project (Grant No. 101120218)
+    </div>
   
   
     Made with
@@ -1068,7 +1094,7 @@
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.tabs", "navigation.sections", "content.code.copy"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.tabs", "navigation.sections", "navigation.top", "content.code.copy", "content.code.annotate"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
       <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
