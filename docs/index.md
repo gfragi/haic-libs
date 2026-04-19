@@ -1,6 +1,13 @@
 # haic-libs
 
-`haic-libs` is a pair of portable Python packages for instrumenting and evaluating Human–AI Collaboration (HAIC) systems. `haic-logging` provides a lightweight context-manager-based logger that captures interaction decisions during a live session and exports them as a structured artifact. `haic-metrics` consumes that artifact offline and computes a standardized set of KPIs — interaction frequency, effort loss, trust proxy, adaptability, and more — without requiring access to the original application, database, or UI.
+**haic-libs** is an open-source Python library for evaluating Human–AI Collaboration (HAIC) systems.
+
+It provides two independent packages:
+
+- `haic-logging` — instrument any human–AI application with 5 lines of code
+- `haic-metrics` — compute HAIC evaluation metrics offline from interaction logs
+
+---
 
 ## Install
 
@@ -8,18 +15,54 @@
 pip install haic-logging haic-metrics
 ```
 
+---
+
 ## Quickstart
 
 ```python
 from haic_logging import HaicLogger
-import haic_metrics
+from haic_metrics import report
 
-with HaicLogger(log_dir="./logs", pilot_tag="pilot-x") as hl:
-    hl.log_decision(actor_type="human", action="confirm", object_id="item_1", duration_s=2.1, correct=True)
-    hl.log_decision(actor_type="ai",    action="suggest", object_id="item_1", latency_ms=95)
+with HaicLogger(log_dir="./logs", pilot_tag="my-app") as hl:
+
+    hl.log_decision(
+        actor_type="human", action="query",
+        object_id="turn_1", duration_s=8.2, correct=True,
+    )
+    hl.log_decision(
+        actor_type="ai", action="respond",
+        object_id="turn_1", latency_ms=1150,
+    )
+
     artifact_path = hl.export_decisions_artifact()
 
-print(haic_metrics.report(artifact_path))
+print(report(artifact_path))
 ```
 
-See the [Integration guide](integration.md) for a step-by-step walkthrough and a full RAG chatbot example.
+That's the full pipeline: instrument → export → evaluate → report.
+
+---
+
+## Why haic-libs?
+
+Most AI evaluation focuses on model accuracy. In deployed systems, overall effectiveness depends on how humans and AI interact — reliance behaviour, cognitive effort, adaptation over time. haic-libs makes these dynamics measurable without modifying your AI system or running user studies.
+
+| Without haic-libs | With haic-libs |
+| --- | --- |
+| Write your own logging schema | `HaicLogger` out of the box |
+| Implement each metric manually | `compute_metrics()` covers 8 KPIs |
+| Bespoke per-project scripts | Portable decisions artifact |
+| Silent failures on missing data | Graceful degradation with warnings |
+| No report | Markdown report in one call |
+
+---
+
+## Paper
+
+> Fragiadakis et al. (2025). *Evaluating Human-AI Collaboration: A Review and Methodological Framework*. [arXiv:2407.19098](https://arxiv.org/abs/2407.19098)
+
+---
+
+## License
+
+MIT — built under the [HumAIne](https://humaine-horizon.eu) Horizon Europe project (Grant No. 101120218).

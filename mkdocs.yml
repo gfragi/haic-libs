@@ -1,7 +1,9 @@
 site_name: haic-libs
+site_description: Open-source Python library for Human-AI Collaboration evaluation
 site_url: https://gfragi.github.io/haic-libs
 repo_url: https://github.com/gfragi/haic-libs
 repo_name: gfragi/haic-libs
+copyright: MIT License — HumAIne Horizon Europe project (Grant No. 101120218)
 
 theme:
   name: material
@@ -9,10 +11,21 @@ theme:
     - scheme: default
       primary: indigo
       accent: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
   features:
     - navigation.tabs
     - navigation.sections
+    - navigation.top
     - content.code.copy
+    - content.code.annotate
 
 plugins:
   - search
@@ -22,6 +35,10 @@ plugins:
           paths:
             - packages/haic_logging/src
             - packages/haic_metrics/src
+          options:
+            show_source: true
+            show_root_heading: true
+            docstring_style: google
 
 nav:
   - Home: index.md
@@ -35,4 +52,8 @@ markdown_extensions:
   - pymdownx.superfences
   - pymdownx.tabbed:
       alternate_style: true
+  - pymdownx.highlight:
+      anchor_linenums: true
   - tables
+  - toc:
+      permalink: true
