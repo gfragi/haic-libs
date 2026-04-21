@@ -1,4 +1,4 @@
-
+# Legacy module — not part of the public API. Retained for reference.
 
 import json
 import time
@@ -9,7 +9,6 @@ import uuid
 import logging
 from typing import Dict, Optional, Any
 from pathlib import Path
-import pynvml
 
 logger = logging.getLogger(__name__)
 
@@ -64,13 +63,14 @@ def get_event_id() -> str:
 
 def get_gpu_usage():
     try:
+        import pynvml  # type: ignore  # optional dependency
         pynvml.nvmlInit()
         handle = pynvml.nvmlDeviceGetHandleByIndex(0)
         util = pynvml.nvmlDeviceGetUtilizationRates(handle)
         pynvml.nvmlShutdown()
         return util.gpu
-    except:
-        return 0.0
+    except Exception:
+        return None
 
 
 def get_machine_metrics() -> Dict[str, Any]:

@@ -42,6 +42,10 @@ def render_markdown_report(
     for k, v in metrics.items():
         repl(f"{{{{ metrics.{k} }}}}", v)
 
+    # Explicit fallback: Tr_note is absent when Tr is computable
+    tr_note = metrics.get("Tr_note", "")
+    repl("{{ metrics.Tr_note }}", tr_note if tr_note else "—")
+
     rt_max_s = result.get("rt_max_s", 60.0)
     repl("{{ rt_max_s }}", rt_max_s)
 

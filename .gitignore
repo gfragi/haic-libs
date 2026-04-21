@@ -1,2 +1,10 @@
 haic_lib_venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+build/
+dist/
+*.egg-info/
+.pytest_cache/
 

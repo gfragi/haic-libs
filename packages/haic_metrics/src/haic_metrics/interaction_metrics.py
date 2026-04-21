@@ -318,7 +318,7 @@ def compute_metrics(
         Tr_note = "no labeled decisions; Tr not computable"
     else:
         Tr = _clip01(1.0 - errors / labeled)
-        Tr_note = "proxy based on available labels"
+        Tr_note = None
 
     # 5) A: adaptability on agent rows; clamp to [-1, 1] via tanh
     if N_agents > 0:
@@ -380,17 +380,19 @@ def compute_metrics(
     EfficiencyScore *= (1.0 + _PROGRESS_BONUS_WEIGHT * _clip01(progress_rate))
     EfficiencyScore = _clip01(EfficiencyScore)
 
-    return {
+    out = {
         "F": float(F),
         "D": float(D),
         "HCL": float(HCL),
         "Tr": None if Tr is None else float(Tr),
-        "Tr_note": Tr_note,
         "A": float(A),
         "S": float(S),
         "EL": None if EL is None else float(EL),
         "EfficiencyScore": float(EfficiencyScore),
     }
+    if Tr_note:
+        out["Tr_note"] = Tr_note
+    return out
 
 def compute_metrics_by_agent(decisions: List[Dict[str, Any]], **kw) -> Dict[str, Dict[str, float]]:
     out: Dict[str, Dict[str, float]] = {}
