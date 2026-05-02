@@ -10,13 +10,13 @@ theme:
   palette:
     - scheme: default
       primary: indigo
-      accent: indigo
+      accent: teal
       toggle:
         icon: material/brightness-7
         name: Switch to dark mode
     - scheme: slate
       primary: indigo
-      accent: indigo
+      accent: teal
       toggle:
         icon: material/brightness-4
         name: Switch to light mode
@@ -44,6 +44,7 @@ nav:
   - Home: index.md
   - Concepts: concepts.md
   - Metrics: metrics.md
+  - Interpretation guide: interpretation.md
   - Integration guide: integration.md
   - API reference: api.md
 

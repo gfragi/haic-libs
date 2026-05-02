@@ -10,10 +10,18 @@
     |---|---|---|---|---|
     | Interaction Frequency | F | total decisions / session duration (s) | Dense, active collaboration | Sparse or stalled session |
     | Mean Action Duration | D | mean(`duration_s`) across all decisions | Slow, effortful actions | Fast, fluent interactions |
-    | Human-Centeredness | HCL | 1 / (1 + mean human `duration_s`) | Human responses are fast | Human responses are slow or absent |
+    | Human-Centeredness | HCL | 1 − (mean human RT / rt_max_s) | High = low cognitive load (fast reaction → low load) | Low = high cognitive load (slow reaction → high load) |
     | Trust / Quality Proxy | Tr | mean(`correct`) where `correct` is present; `None` if no labels | High accuracy / acceptance rate | Frequent corrections or rejections |
-    | Efficiency / Effort Loss | EL | (mean human `duration_s` − baseline) / baseline | Human is slower than baseline | Human matches or beats baseline |
+    | Efficiency / Effort Loss | EL | (mean human `duration_s` − baseline) / baseline | Human is slower than baseline (EL > 0; cannot be negative) | Human at or faster than baseline (EL = 0) |
     | Efficiency Score | — | composite of EL and penalty terms | Efficient, low-overhead session | High effort relative to outcome |
+
+
+    !!! warning "HCL direction is inverted"
+        **High HCL = low cognitive load = good.**  
+        **Low HCL = high cognitive load = bad.**  
+        HCL=1.0 means the human reacted instantly (minimal load). HCL=0.0 means they
+        took the maximum expected time (maximum load). See the
+        [Interpretation guide](interpretation.md#hcl--human-centeredness) for details.
 
     ## Human Effort & Responsiveness
 
@@ -80,3 +88,10 @@ result = compute_metrics(
 ```
 
 Two modes are supported: `"relative"` (seconds from session start) and `"absolute"` (ISO 8601 UTC timestamps). The evaluation report always discloses the effective window used.
+
+---
+
+## Going deeper
+
+For full derivations, intuition, quadrant diagnostics, and common error patterns, see
+the **[Metric Interpretation Guide](interpretation.md)**.
