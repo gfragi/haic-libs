@@ -420,13 +420,13 @@ When S is below threshold, do not interpret F, EL, HCL, Tr, or A from that simul
 S is the validity gate that must pass before trusting any other metric.
 
 
- ## Live Quadrant Diagnostic Tool
+## Live Quadrant Diagnostic Tool
 
 Adjust the sliders to explore how metric pairs map to the four interpretive zones.
 
 <div style="border: 1px solid #e2e6ea; border-radius: 10px; overflow: hidden; margin: 24px 0;">
   <iframe 
-    src="../assets/quadrant_plots.html"
+    src="assets/haic_quadrant_plots_v3.html"
     width="100%" 
     height="780"
     style="border: none; display: block;"
