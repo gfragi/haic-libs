@@ -1,0 +1,1080 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HAIC Quadrant Diagnostic Plots — v3</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #f8f9fb;
+    --surface: #ffffff;
+    --border: #e2e6ea;
+    --text-primary: #1a1d23;
+    --text-secondary: #5a6278;
+    --text-muted: #9aa0b4;
+    --accent: #2563eb;
+    --accent-light: #eff6ff;
+    --good: #16a34a;
+    --good-bg: rgba(22,163,74,0.08);
+    --warn: #d97706;
+    --warn-bg: rgba(217,119,6,0.08);
+    --danger: #dc2626;
+    --danger-bg: rgba(220,38,38,0.08);
+    --neutral: #6b7280;
+    --tab-active-bg: #1e293b;
+    --tab-active-text: #ffffff;
+    --shadow: 0 1px 4px rgba(0,0,0,0.08), 0 4px 16px rgba(0,0,0,0.04);
+    --radius: 10px;
+  }
+
+  body {
+    font-family: 'IBM Plex Sans', -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text-primary);
+    min-height: 100vh;
+    padding: 24px;
+  }
+
+  .page-header {
+    max-width: 1100px;
+    margin: 0 auto 24px;
+  }
+  .page-header h1 {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text-primary);
+    letter-spacing: -0.3px;
+  }
+  .page-header p {
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin-top: 4px;
+  }
+  .badge {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 20px;
+    margin-left: 8px;
+    vertical-align: middle;
+  }
+  .badge-eu { background: #dbeafe; color: #1d4ed8; }
+
+  /* Tabs */
+  .tab-bar {
+    display: flex;
+    gap: 4px;
+    max-width: 1100px;
+    margin: 0 auto 20px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 6px;
+    flex-wrap: wrap;
+  }
+  .tab-btn {
+    flex: 1;
+    min-width: 140px;
+    padding: 8px 12px;
+    border: none;
+    background: transparent;
+    border-radius: 7px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    transition: all 0.15s;
+    text-align: center;
+    line-height: 1.3;
+  }
+  .tab-btn:hover { background: var(--bg); color: var(--text-primary); }
+  .tab-btn.active { background: var(--tab-active-bg); color: var(--tab-active-text); }
+  .tab-btn .tab-axes { font-size: 10px; opacity: 0.75; display: block; margin-top: 1px; font-family: 'IBM Plex Mono', monospace; }
+
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  /* Layout */
+  .panel-grid {
+    display: grid;
+    grid-template-columns: 340px 1fr 260px;
+    gap: 16px;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px;
+    box-shadow: var(--shadow);
+  }
+
+  .card-title {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--text-muted);
+    margin-bottom: 14px;
+  }
+
+  /* Formula Panel */
+  .formula-block {
+    background: #f1f5f9;
+    border-radius: 6px;
+    padding: 10px 12px;
+    margin-bottom: 10px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    color: var(--text-primary);
+    line-height: 1.6;
+  }
+  .formula-block .metric-name {
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    display: inline-block;
+    flex-shrink: 0;
+  }
+  .dot-x { background: var(--accent); }
+  .dot-y { background: #7c3aed; }
+
+  .direction-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 20px;
+    margin-top: 6px;
+  }
+  .dir-good { background: var(--good-bg); color: var(--good); }
+  .dir-inverted { background: #f3e8ff; color: #6d28d9; }
+  .dir-neutral { background: #f0f9ff; color: #0369a1; }
+
+  .range-label {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 4px;
+    font-family: 'IBM Plex Mono', monospace;
+  }
+
+  .divider { border: none; border-top: 1px solid var(--border); margin: 12px 0; }
+
+  /* Sliders */
+  .slider-group { margin-bottom: 12px; }
+  .slider-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 4px;
+  }
+  .slider-label { font-size: 12px; font-weight: 500; color: var(--text-secondary); }
+  .slider-value {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-primary);
+    min-width: 48px;
+    text-align: right;
+  }
+  input[type=range] {
+    width: 100%;
+    height: 4px;
+    border-radius: 2px;
+    background: var(--border);
+    outline: none;
+    -webkit-appearance: none;
+    cursor: pointer;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 14px; height: 14px;
+    background: var(--accent);
+    border-radius: 50%;
+    border: 2px solid white;
+    box-shadow: 0 0 0 1px var(--border);
+  }
+
+  /* Quadrant SVG */
+  .chart-card { padding: 12px; }
+  .chart-card svg { display: block; width: 100%; height: auto; }
+
+  /* Interpretation Panel */
+  .interp-box {
+    border-radius: 8px;
+    padding: 12px 14px;
+    margin-bottom: 10px;
+    border-left: 3px solid;
+  }
+  .interp-box.good { background: var(--good-bg); border-color: var(--good); }
+  .interp-box.warn { background: var(--warn-bg); border-color: var(--warn); }
+  .interp-box.danger { background: var(--danger-bg); border-color: var(--danger); }
+  .interp-box.neutral { background: #f8fafc; border-color: var(--neutral); }
+  .interp-box h4 {
+    font-size: 12px; font-weight: 700; margin-bottom: 4px;
+  }
+  .interp-box.good h4 { color: var(--good); }
+  .interp-box.warn h4 { color: var(--warn); }
+  .interp-box.danger h4 { color: var(--danger); }
+  .interp-box p { font-size: 11.5px; color: var(--text-secondary); line-height: 1.5; }
+
+  .pilot-examples { margin-top: 14px; }
+  .pilot-examples .card-title { margin-bottom: 8px; }
+  .pilot-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+    font-size: 11.5px;
+  }
+  .pilot-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .pilot-name { font-weight: 600; color: var(--text-primary); }
+  .pilot-vals { color: var(--text-secondary); font-family: 'IBM Plex Mono', monospace; font-size: 11px; }
+
+  .note-box {
+    background: #fffbeb;
+    border: 1px solid #fde68a;
+    border-radius: 6px;
+    padding: 10px 12px;
+    font-size: 11.5px;
+    color: #78350f;
+    margin-top: 10px;
+    line-height: 1.5;
+  }
+
+  /* Simulation badge */
+  .sim-badge {
+    display: inline-block;
+    background: #f3e8ff;
+    color: #6d28d9;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 20px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+  }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <h1>HAIC Quadrant Diagnostic Plots
+    <span class="badge badge-eu">HumAIne · EU Horizon 101120218</span>
+  </h1>
+  <p>Interactive diagnostic tool for Lectures 9 &amp; 10 — Agentic Software Engineering MSc · HUA</p>
+</div>
+
+<div class="tab-bar" id="tabBar">
+  <button class="tab-btn active" data-tab="el-tr" onclick="switchTab('el-tr',this)">
+    Efficiency × Trust
+    <span class="tab-axes">EL × Tr</span>
+  </button>
+  <button class="tab-btn" data-tab="hcl-f" onclick="switchTab('hcl-f',this)">
+    Cognitive Load × Frequency
+    <span class="tab-axes">HCL × F</span>
+  </button>
+  <button class="tab-btn" data-tab="a-tr" onclick="switchTab('a-tr',this)">
+    Adaptability × Trust
+    <span class="tab-axes">A × Tr</span>
+  </button>
+  <button class="tab-btn" data-tab="el-hcl" onclick="switchTab('el-hcl',this)">
+    Overhead × Cognitive Load
+    <span class="tab-axes">EL × HCL</span>
+  </button>
+  <button class="tab-btn" data-tab="s-a" onclick="switchTab('s-a',this)">
+    Surrogate × Adaptability
+    <span class="tab-axes">S × A</span>
+  </button>
+</div>
+
+<!-- ===================== EL × Tr ===================== -->
+<div class="tab-panel active" id="tab-el-tr">
+<div class="panel-grid">
+
+  <!-- Left: Formula -->
+  <div class="card">
+    <div class="card-title">Metric Formulas &amp; Directions</div>
+
+    <div class="formula-block">
+      <div class="metric-name"><span class="dot dot-x"></span>EL — Effort Loss (X-axis)</div>
+      <code>EL = (t_actual − t_baseline) / t_baseline</code>
+      <div class="range-label">Range: [0, ∞) · 0 = optimal · EL cannot be negative</div>
+      <div class="direction-pill dir-good">← lower = better overhead</div>
+    </div>
+
+    <div class="formula-block">
+      <div class="metric-name"><span class="dot dot-y"></span>Tr — Trust Proxy (Y-axis)</div>
+      <code>Tr = accepted_suggestions / total_suggestions</code>
+      <div class="range-label">Range: [0, 1] · behavioral proxy only</div>
+      <div class="direction-pill dir-good">↑ higher = more acceptance</div>
+    </div>
+
+    <hr class="divider">
+    <div class="card-title">Adjust Values</div>
+
+    <div class="slider-group">
+      <div class="slider-row">
+        <span class="slider-label">EL (Effort Loss)</span>
+        <span class="slider-value" id="el-tr-el-val">0.18</span>
+      </div>
+      <input type="range" min="0" max="200" value="36" id="sl-el-tr-el"
+             oninput="updatePlot('el-tr')" title="EL slider (0–2.0)">
+    </div>
+
+    <div class="slider-group">
+      <div class="slider-row">
+        <span class="slider-label">Tr (Trust Proxy)</span>
+        <span class="slider-value" id="el-tr-tr-val">0.67</span>
+      </div>
+      <input type="range" min="0" max="100" value="67" id="sl-el-tr-tr"
+             oninput="updatePlot('el-tr')" title="Tr slider (0–1.0)">
+    </div>
+
+    <div class="pilot-examples">
+      <div class="card-title">Real Pilot Values</div>
+      <div class="pilot-row">
+        <span class="pilot-dot" style="background:#f59e0b"></span>
+        <span class="pilot-name">RAG Chatbot</span>
+        <span class="pilot-vals">EL≈0.15, Tr=0.667±0.115</span>
+      </div>
+      <div class="pilot-row">
+        <span class="pilot-dot" style="background:#3b82f6"></span>
+        <span class="pilot-name">Novoville</span>
+        <span class="pilot-vals">EL≈0.18, Tr≈0.76</span>
+      </div>
+      <div style="margin-top:6px">
+        <button onclick="loadPreset('el-tr','rag')"
+          style="font-size:11px;padding:3px 8px;border:1px solid var(--border);border-radius:5px;background:white;cursor:pointer;margin-right:4px;font-family:inherit">RAG</button>
+        <button onclick="loadPreset('el-tr','novo')"
+          style="font-size:11px;padding:3px 8px;border:1px solid var(--border);border-radius:5px;background:white;cursor:pointer;font-family:inherit">Novoville</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Center: Plot -->
+  <div class="card chart-card">
+    <svg id="svg-el-tr" viewBox="0 0 520 440" xmlns="http://www.w3.org/2000/svg"></svg>
+  </div>
+
+  <!-- Right: Interpretation -->
+  <div class="card">
+    <div class="card-title">Quadrant Interpretation</div>
+    <div id="interp-el-tr">
+      <div class="interp-box neutral"><h4>—</h4><p>Move the sliders to see interpretation.</p></div>
+    </div>
+
+    <hr class="divider">
+
+    <div class="interp-box good">
+      <h4>✓ Ideal (low EL, high Tr)</h4>
+      <p>AI saves time and humans trust its suggestions. Genuine collaboration benefit.</p>
+    </div>
+    <div class="interp-box warn">
+      <h4>⚠ Automation Bias (low EL, low Tr)</h4>
+      <p>Efficient but low acceptance. Humans may be ignoring AI. Check for skill degradation.</p>
+    </div>
+    <div class="interp-box warn">
+      <h4>⚠ Costly Trust (high EL, high Tr)</h4>
+      <p>AI accepted often but at high time cost. Integration overhead problem.</p>
+    </div>
+    <div class="interp-box danger">
+      <h4>✗ Breakdown (high EL, low Tr)</h4>
+      <p>High overhead AND low acceptance. AI adds friction without contributing value.</p>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- ===================== HCL × F ===================== -->
+<div class="tab-panel" id="tab-hcl-f">
+<div class="panel-grid">
+
+  <div class="card">
+    <div class="card-title">Metric Formulas &amp; Directions</div>
+
+    <div class="formula-block">
+      <div class="metric-name"><span class="dot dot-x"></span>HCL — Human-Centeredness (X-axis)</div>
+      <code>HCL = 1 − (RT / RT_max)</code>
+      <div class="range-label">Range: [0, 1] · RT = human reaction time</div>
+      <div class="direction-pill dir-inverted">↑ higher HCL = LOWER cognitive load</div>
+    </div>
+
+    <div class="formula-block">
+      <div class="metric-name"><span class="dot dot-y"></span>F — Interaction Frequency (Y-axis)</div>
+      <code>F = N_interactions / (T_session / 60)</code>
+      <div class="range-label">Range: [0, 10+] events/min · context-dependent</div>
+      <div class="direction-pill dir-neutral">↕ neutral — optimal depends on task</div>
+    </div>
+
+    <hr class="divider">
+    <div class="card-title">Adjust Values</div>
+
+    <div class="slider-group">
+      <div class="slider-row">
+        <span class="slider-label">HCL (0=high load, 1=low load)</span>
+        <span class="slider-value" id="hcl-f-hcl-val">0.84</span>
+      </div>
+      <input type="range" min="0" max="100" value="84" id="sl-hcl-f-hcl"
+             oninput="updatePlot('hcl-f')">
+    </div>
+
+    <div class="slider-group">
+      <div class="slider-row">
+        <span class="slider-label">F (events/min)</span>
+        <span class="slider-value" id="hcl-f-f-val">3.6</span>
+      </div>
+      <input type="range" min="0" max="100" value="36" id="sl-hcl-f-f"
+             oninput="updatePlot('hcl-f')">
+    </div>
+
+    <div class="pilot-examples">
+      <div class="card-title">Real Pilot Values</div>
+      <div class="pilot-row">
+        <span class="pilot-dot" style="background:#f59e0b"></span>
+        <span class="pilot-name">RAG Chatbot</span>
+        <span class="pilot-vals">HCL=0.835, F=3.61±0.55</span>
+      </div>
+      <div style="margin-top:6px">
+        <button onclick="loadPreset('hcl-f','rag')"
+          style="font-size:11px;padding:3px 8px;border:1px solid var(--border);border-radius:5px;background:white;cursor:pointer;font-family:inherit">RAG</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card chart-card">
+    <svg id="svg-hcl-f" viewBox="0 0 520 440" xmlns="http://www.w3.org/2000/svg"></svg>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Quadrant Interpretation</div>
+    <div id="interp-hcl-f">
+      <div class="interp-box neutral"><h4>—</h4><p>Move the sliders to see interpretation.</p></div>
+    </div>
+
+    <hr class="divider">
+
+    <div class="note-box">
+      <strong>⚠ HCL is inverted.</strong><br>
+      HCL = 1 means the human responded <em>instantly</em> (zero reaction time → zero load).<br>
+      HCL = 0 means the human took maximum time (RT_max → full load).
+    </div>
+
+    <hr class="divider">
+
+    <div class="interp-box good">
+      <h4>✓ Ideal (high HCL, moderate F)</h4>
+      <p>Humans respond fluidly. Interaction rate fits the task pace naturally.</p>
+    </div>
+    <div class="interp-box danger">
+      <h4>✗ Overload (low HCL, high F)</h4>
+      <p>Humans are slow AND overwhelmed with interactions. Immediate redesign needed.</p>
+    </div>
+    <div class="interp-box warn">
+      <h4>⚠ Disengaged (high HCL, very low F)</h4>
+      <p>Humans are fast but barely interacting. Possible automation bias or UI barriers.</p>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- ===================== A × Tr ===================== -->
+<div class="tab-panel" id="tab-a-tr">
+<div class="panel-grid">
+
+  <div class="card">
+    <div class="card-title">Metric Formulas &amp; Directions</div>
+
+    <div class="formula-block">
+      <div class="metric-name"><span class="dot dot-x"></span>A — Adaptability (X-axis)</div>
+      <code>A = tanh((Acc_late − Acc_early) / Acc_early)</code>
+      <div class="range-label">Range: [−1, +1] · first/last 20% windows<br>Acc = acceptance rate in each window</div>
+      <div class="direction-pill dir-good">↑ positive = humans improving trust over time</div>
+    </div>
+
+    <div class="formula-block">
+      <div class="metric-name"><span class="dot dot-y"></span>Tr — Trust Proxy (Y-axis)</div>
+      <code>Tr = accepted / total suggestions</code>
+      <div class="range-label">Range: [0, 1]</div>
+      <div class="direction-pill dir-good">↑ higher = more acceptance</div>
+    </div>
+
+    <hr class="divider">
+    <div class="card-title">Adjust Values</div>
+
+    <div class="slider-group">
+      <div class="slider-row">
+        <span class="slider-label">A (Adaptability, −1 to +1)</span>
+        <span class="slider-value" id="a-tr-a-val">+0.30</span>
+      </div>
+      <input type="range" min="0" max="100" value="65" id="sl-a-tr-a"
+             oninput="updatePlot('a-tr')">
+    </div>
+
+    <div class="slider-group">
+      <div class="slider-row">
+        <span class="slider-label">Tr (Trust Proxy)</span>
+        <span class="slider-value" id="a-tr-tr-val">0.67</span>
+      </div>
+      <input type="range" min="0" max="100" value="67" id="sl-a-tr-tr"
+             oninput="updatePlot('a-tr')">
+    </div>
+
+    <div class="note-box" style="margin-top:10px">
+      <strong>Note:</strong> A uses 20% windows (first 20% and last 20% of session events), <em>not</em> the first and second halves. A positive A means the AI is becoming more trusted as the session progresses.
+    </div>
+  </div>
+
+  <div class="card chart-card">
+    <svg id="svg-a-tr" viewBox="0 0 520 440" xmlns="http://www.w3.org/2000/svg"></svg>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Quadrant Interpretation</div>
+    <div id="interp-a-tr">
+      <div class="interp-box neutral"><h4>—</h4><p>Move the sliders to see interpretation.</p></div>
+    </div>
+
+    <hr class="divider">
+
+    <div class="interp-box good">
+      <h4>✓ Growing Trust (positive A, high Tr)</h4>
+      <p>Humans increasingly accept AI. Trust is building across the session.</p>
+    </div>
+    <div class="interp-box warn">
+      <h4>⚠ Eroding Trust (negative A, moderate Tr)</h4>
+      <p>Initial acceptance declining. Humans may be losing confidence in the AI.</p>
+    </div>
+    <div class="interp-box danger">
+      <h4>✗ Abandonment (negative A, low Tr)</h4>
+      <p>Low overall trust that is also declining. AI is not delivering value.</p>
+    </div>
+    <div class="interp-box warn">
+      <h4>⚠ Ceiling Effect (near-zero A, high Tr)</h4>
+      <p>Already at high trust — no room to grow. Ensure it's not automation bias.</p>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- ===================== EL × HCL ===================== -->
+<div class="tab-panel" id="tab-el-hcl">
+<div class="panel-grid">
+
+  <div class="card">
+    <div class="card-title">Metric Formulas &amp; Directions</div>
+
+    <div class="formula-block">
+      <div class="metric-name"><span class="dot dot-x"></span>EL — Effort Loss (X-axis)</div>
+      <code>EL = (t_actual − t_baseline) / t_baseline</code>
+      <div class="range-label">Range: [0, ∞) · 0 = no overhead</div>
+      <div class="direction-pill dir-good">← lower = less overhead</div>
+    </div>
+
+    <div class="formula-block">
+      <div class="metric-name"><span class="dot dot-y"></span>HCL — Human-Centeredness (Y-axis)</div>
+      <code>HCL = 1 − (RT / RT_max)</code>
+      <div class="range-label">Range: [0, 1]</div>
+      <div class="direction-pill dir-inverted">↑ higher HCL = LOWER cognitive load</div>
+    </div>
+
+    <hr class="divider">
+    <div class="card-title">Adjust Values</div>
+
+    <div class="slider-group">
+      <div class="slider-row">
+        <span class="slider-label">EL (Effort Loss)</span>
+        <span class="slider-value" id="el-hcl-el-val">0.18</span>
+      </div>
+      <input type="range" min="0" max="200" value="36" id="sl-el-hcl-el"
+             oninput="updatePlot('el-hcl')">
+    </div>
+
+    <div class="slider-group">
+      <div class="slider-row">
+        <span class="slider-label">HCL (0=high load, 1=low load)</span>
+        <span class="slider-value" id="el-hcl-hcl-val">0.84</span>
+      </div>
+      <input type="range" min="0" max="100" value="84" id="sl-el-hcl-hcl"
+             oninput="updatePlot('el-hcl')">
+    </div>
+
+    <div class="note-box" style="margin-top:10px">
+      <strong>Key insight:</strong> This quadrant separates <em>genuine</em> efficiency gains (low EL + low cognitive load) from <em>false</em> efficiency gains where the AI speeds things up but overloads the human.
+    </div>
+  </div>
+
+  <div class="card chart-card">
+    <svg id="svg-el-hcl" viewBox="0 0 520 440" xmlns="http://www.w3.org/2000/svg"></svg>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Quadrant Interpretation</div>
+    <div id="interp-el-hcl">
+      <div class="interp-box neutral"><h4>—</h4><p>Move the sliders to see interpretation.</p></div>
+    </div>
+
+    <hr class="divider">
+
+    <div class="interp-box good">
+      <h4>✓ Genuine Efficiency (low EL, high HCL)</h4>
+      <p>AI reduces overhead without taxing the human. True collaboration benefit.</p>
+    </div>
+    <div class="interp-box danger">
+      <h4>✗ False Efficiency (low EL, low HCL)</h4>
+      <p>Speed gains come at the cost of human strain. Unsustainable in the long run.</p>
+    </div>
+    <div class="interp-box warn">
+      <h4>⚠ Burden (high EL, low HCL)</h4>
+      <p>High overhead AND high cognitive load. AI is hurting rather than helping.</p>
+    </div>
+    <div class="interp-box neutral">
+      <h4>— Wasted Capacity (high EL, high HCL)</h4>
+      <p>Human is comfortable but the AI adds overhead. Optimize for efficiency.</p>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- ===================== S × A ===================== -->
+<div class="tab-panel" id="tab-s-a">
+<div class="panel-grid">
+
+  <div class="card">
+    <div class="card-title">Metric Formulas &amp; Directions</div>
+
+    <div class="sim-badge">⚗ Simulation Context Only</div>
+
+    <div class="formula-block">
+      <div class="metric-name"><span class="dot dot-x"></span>S — Surrogate Similarity (X-axis)</div>
+      <code>S = 1 − JSD(p_surrogate ∥ p_human)</code>
+      <div class="range-label">Range: [0, 1] · JSD = Jensen-Shannon Divergence<br>1 = surrogate perfectly matches human distribution</div>
+      <div class="direction-pill dir-good">↑ higher = surrogate more faithful</div>
+    </div>
+
+    <div class="formula-block">
+      <div class="metric-name"><span class="dot dot-y"></span>A — Adaptability (Y-axis)</div>
+      <code>A = tanh((Acc_late − Acc_early) / Acc_early)</code>
+      <div class="range-label">Range: [−1, +1] · first/last 20% windows</div>
+      <div class="direction-pill dir-good">↑ positive = trust improving</div>
+    </div>
+
+    <hr class="divider">
+    <div class="card-title">Adjust Values</div>
+
+    <div class="slider-group">
+      <div class="slider-row">
+        <span class="slider-label">S (Surrogate Similarity)</span>
+        <span class="slider-value" id="s-a-s-val">0.72</span>
+      </div>
+      <input type="range" min="0" max="100" value="72" id="sl-s-a-s"
+             oninput="updatePlot('s-a')">
+    </div>
+
+    <div class="slider-group">
+      <div class="slider-row">
+        <span class="slider-label">A (Adaptability, −1 to +1)</span>
+        <span class="slider-value" id="s-a-a-val">+0.30</span>
+      </div>
+      <input type="range" min="0" max="100" value="65" id="sl-s-a-a"
+             oninput="updatePlot('s-a')">
+    </div>
+
+    <div class="note-box" style="margin-top:10px">
+      <strong>Note:</strong> S is only meaningful when a surrogate (synthetic) agent is used instead of real human participants. It quantifies how faithfully the surrogate replicates real human decision distributions. Do not compute S in real-user studies.
+    </div>
+  </div>
+
+  <div class="card chart-card">
+    <svg id="svg-s-a" viewBox="0 0 520 440" xmlns="http://www.w3.org/2000/svg"></svg>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Quadrant Interpretation</div>
+    <div id="interp-s-a">
+      <div class="interp-box neutral"><h4>—</h4><p>Move the sliders to see interpretation.</p></div>
+    </div>
+
+    <hr class="divider">
+
+    <div class="interp-box good">
+      <h4>✓ Valid Simulation (high S, positive A)</h4>
+      <p>Surrogate faithfully replicates humans AND the AI improves over time. Results are trustworthy.</p>
+    </div>
+    <div class="interp-box danger">
+      <h4>✗ Unreliable Simulation (low S, any A)</h4>
+      <p>Surrogate doesn't match real humans. Adaptability results cannot be trusted.</p>
+    </div>
+    <div class="interp-box warn">
+      <h4>⚠ Good Sim, Declining Trust (high S, negative A)</h4>
+      <p>Simulation is valid but trust is eroding. Investigate AI quality or task framing.</p>
+    </div>
+    <div class="interp-box neutral">
+      <h4>— High S, Flat A (high S, A ≈ 0)</h4>
+      <p>Valid simulation with stable trust. Normal for short or easy sessions.</p>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<script>
+// =====================================================================
+//  Tab switching
+// =====================================================================
+function switchTab(id, btn) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  btn.classList.add('active');
+  updatePlot(id);
+}
+
+// =====================================================================
+//  Per-tab slider → metric conversion (real ranges)
+// =====================================================================
+const CONFIGS = {
+  'el-tr': {
+    axes: { x: 'EL', y: 'Tr' },
+    xRange: [0, 2.0], yRange: [0, 1],
+    xLabel: '← lower overhead   EL (Effort Loss)   higher overhead →',
+    yLabel: '↑ Tr = higher acceptance (behavioral proxy)',
+    xThresh: 0.3, yThresh: 0.5,
+    goodCorner: 'left-top',
+    sliders: {
+      x: { id: 'sl-el-tr-el', dispId: 'el-tr-el-val', min: 0, max: 2.0, slMax: 200, fmt: v => v.toFixed(2) },
+      y: { id: 'sl-el-tr-tr', dispId: 'el-tr-tr-val', min: 0, max: 1,   slMax: 100, fmt: v => v.toFixed(2) }
+    },
+    zones: [
+      { label: 'Ideal', color: '#dcfce7', x1: 0, x2: 0.5, y1: 0.5, y2: 1 },
+      { label: 'Automation Bias?', color: '#fef9c3', x1: 0, x2: 0.5, y1: 0, y2: 0.5 },
+      { label: 'Costly Trust', color: '#fff7ed', x1: 0.5, x2: 1, y1: 0.5, y2: 1 },
+      { label: 'Breakdown', color: '#fee2e2', x1: 0.5, x2: 1, y1: 0, y2: 0.5 }
+    ]
+  },
+  'hcl-f': {
+    axes: { x: 'HCL', y: 'F' },
+    xRange: [0, 1], yRange: [0, 10],
+    xLabel: '← high load   HCL   low load → (inverted: ↑ = less burden)',
+    yLabel: 'F = events per minute (task-dependent)',
+    xThresh: 0.5, yThresh: 5,
+    goodCorner: 'right-mid',
+    sliders: {
+      x: { id: 'sl-hcl-f-hcl', dispId: 'hcl-f-hcl-val', min: 0, max: 1, slMax: 100, fmt: v => v.toFixed(2) },
+      y: { id: 'sl-hcl-f-f',   dispId: 'hcl-f-f-val',   min: 0, max: 10, slMax: 100, fmt: v => v.toFixed(1) }
+    },
+    zones: [
+      { label: 'Overloaded', color: '#fee2e2', x1: 0, x2: 0.5, y1: 0.5, y2: 1 },
+      { label: 'Disengaged', color: '#fef9c3', x1: 0.5, x2: 1, y1: 0, y2: 0.5 },
+      { label: 'Comfortable\nLow Activity', color: '#f0fdf4', x1: 0.5, x2: 1, y1: 0.5, y2: 1 },
+      { label: 'Struggling', color: '#fff7ed', x1: 0, x2: 0.5, y1: 0, y2: 0.5 }
+    ]
+  },
+  'a-tr': {
+    axes: { x: 'A', y: 'Tr' },
+    xRange: [-1, 1], yRange: [0, 1],
+    xLabel: '← eroding trust   A (Adaptability)   growing trust →',
+    yLabel: '↑ Tr = higher acceptance',
+    xThresh: 0, yThresh: 0.5,
+    goodCorner: 'right-top',
+    sliders: {
+      x: { id: 'sl-a-tr-a',  dispId: 'a-tr-a-val',  min: -1, max: 1, slMax: 100, fmt: v => (v >= 0 ? '+' : '') + v.toFixed(2) },
+      y: { id: 'sl-a-tr-tr', dispId: 'a-tr-tr-val', min: 0,  max: 1, slMax: 100, fmt: v => v.toFixed(2) }
+    },
+    zones: [
+      { label: 'Growing Trust', color: '#dcfce7', x1: 0.5, x2: 1, y1: 0.5, y2: 1 },
+      { label: 'Abandonment', color: '#fee2e2', x1: 0, x2: 0.5, y1: 0, y2: 0.5 },
+      { label: 'Ceiling Effect', color: '#fef9c3', x1: 0.5, x2: 1, y1: 0, y2: 0.5 },
+      { label: 'Eroding Trust', color: '#fff7ed', x1: 0, x2: 0.5, y1: 0.5, y2: 1 }
+    ]
+  },
+  'el-hcl': {
+    axes: { x: 'EL', y: 'HCL' },
+    xRange: [0, 2.0], yRange: [0, 1],
+    xLabel: '← lower overhead   EL (Effort Loss)   higher overhead →',
+    yLabel: '↑ HCL = lower cognitive load (inverted metric)',
+    xThresh: 0.3, yThresh: 0.5,
+    goodCorner: 'left-top',
+    sliders: {
+      x: { id: 'sl-el-hcl-el',  dispId: 'el-hcl-el-val',  min: 0, max: 2.0, slMax: 200, fmt: v => v.toFixed(2) },
+      y: { id: 'sl-el-hcl-hcl', dispId: 'el-hcl-hcl-val', min: 0, max: 1,   slMax: 100, fmt: v => v.toFixed(2) }
+    },
+    zones: [
+      { label: 'Genuine\nEfficiency', color: '#dcfce7', x1: 0, x2: 0.5, y1: 0.5, y2: 1 },
+      { label: 'False Efficiency\n(human strained)', color: '#fee2e2', x1: 0, x2: 0.5, y1: 0, y2: 0.5 },
+      { label: 'Wasted\nCapacity', color: '#f0f9ff', x1: 0.5, x2: 1, y1: 0.5, y2: 1 },
+      { label: 'Burden', color: '#fff7ed', x1: 0.5, x2: 1, y1: 0, y2: 0.5 }
+    ]
+  },
+  's-a': {
+    axes: { x: 'S', y: 'A' },
+    xRange: [0, 1], yRange: [-1, 1],
+    xLabel: '← surrogate diverges   S (Surrogate Similarity)   surrogate faithful →',
+    yLabel: '↑ A = trust improving   (A ↓ = trust eroding)',
+    xThresh: 0.6, yThresh: 0,
+    goodCorner: 'right-top',
+    sliders: {
+      x: { id: 'sl-s-a-s', dispId: 's-a-s-val', min: 0, max: 1,  slMax: 100, fmt: v => v.toFixed(2) },
+      y: { id: 'sl-s-a-a', dispId: 's-a-a-val', min: -1, max: 1, slMax: 100, fmt: v => (v >= 0 ? '+' : '') + v.toFixed(2) }
+    },
+    zones: [
+      { label: 'Valid Sim\nTrust Growing', color: '#dcfce7', x1: 0.5, x2: 1, y1: 0.5, y2: 1 },
+      { label: 'Unreliable\nSim', color: '#fee2e2', x1: 0, x2: 0.5, y1: 0, y2: 1 },
+      { label: 'Valid Sim\nTrust Eroding', color: '#fff7ed', x1: 0.5, x2: 1, y1: 0, y2: 0.5 }
+    ]
+  }
+};
+
+// =====================================================================
+//  Slider read helpers
+// =====================================================================
+function getMetricValues(tabId) {
+  const cfg = CONFIGS[tabId];
+  const xs = cfg.sliders.x, ys = cfg.sliders.y;
+  const xSlider = document.getElementById(xs.id);
+  const ySlider = document.getElementById(ys.id);
+  const xVal = xs.min + (xSlider.value / xs.slMax) * (xs.max - xs.min);
+  const yVal = ys.min + (ySlider.value / ys.slMax) * (ys.max - ys.min);
+  document.getElementById(xs.dispId).textContent = xs.fmt(xVal);
+  document.getElementById(ys.dispId).textContent = ys.fmt(yVal);
+  return { x: xVal, y: yVal };
+}
+
+// =====================================================================
+//  Preset loader
+// =====================================================================
+const PRESETS = {
+  'el-tr': {
+    'rag':  { x: 0.15, y: 0.667 },
+    'novo': { x: 0.18, y: 0.76  }
+  },
+  'hcl-f': {
+    'rag': { x: 0.835, y: 3.61 }
+  }
+};
+
+function loadPreset(tabId, name) {
+  const p = PRESETS[tabId]?.[name];
+  if (!p) return;
+  const cfg = CONFIGS[tabId];
+  const xs = cfg.sliders.x, ys = cfg.sliders.y;
+  document.getElementById(xs.id).value = Math.round((p.x - xs.min) / (xs.max - xs.min) * xs.slMax);
+  document.getElementById(ys.id).value = Math.round((p.y - ys.min) / (ys.max - ys.min) * ys.slMax);
+  updatePlot(tabId);
+}
+
+// =====================================================================
+//  SVG drawing
+// =====================================================================
+const PAD = { left: 60, right: 20, top: 20, bottom: 60 };
+const W = 520, H = 440;
+const CW = W - PAD.left - PAD.right;
+const CH = H - PAD.top - PAD.bottom;
+
+function toPixel(v, vMin, vMax, pxLen, inverted) {
+  const frac = (v - vMin) / (vMax - vMin);
+  return inverted ? pxLen * (1 - frac) : pxLen * frac;
+}
+
+function drawQuadrant(tabId, xVal, yVal) {
+  const cfg = CONFIGS[tabId];
+  const [xMin, xMax] = cfg.xRange;
+  const [yMin, yMax] = cfg.yRange;
+  const svg = document.getElementById('svg-' + tabId);
+
+  const px = (v) => PAD.left + toPixel(v, xMin, xMax, CW, false);
+  const py = (v) => PAD.top  + toPixel(v, yMin, yMax, CH, true);
+
+  const lines = [];
+
+  // Zone backgrounds
+  cfg.zones.forEach(z => {
+    const zx1 = PAD.left + z.x1 * CW;
+    const zy1 = PAD.top  + (1 - z.y2) * CH;
+    const zw  = (z.x2 - z.x1) * CW;
+    const zh  = (z.y2 - z.y1) * CH;
+    lines.push(`<rect x="${zx1}" y="${zy1}" width="${zw}" height="${zh}" fill="${z.color}" opacity="0.7"/>`);
+    // Zone label
+    const cx = zx1 + zw / 2;
+    const cy = zy1 + zh / 2;
+    const parts = z.label.split('\n');
+    const labelLines = parts.map((t, i) =>
+      `<tspan x="${cx}" dy="${i === 0 ? 0 : 14}">${t}</tspan>`
+    ).join('');
+    lines.push(`<text x="${cx}" y="${cy - (parts.length - 1) * 7}" text-anchor="middle" font-family="IBM Plex Sans,sans-serif" font-size="10" font-weight="600" fill="#374151" opacity="0.5">${labelLines}</text>`);
+  });
+
+  // Axes
+  lines.push(`<rect x="${PAD.left}" y="${PAD.top}" width="${CW}" height="${CH}" fill="none" stroke="#d1d5db" stroke-width="1"/>`);
+
+  // Threshold lines (dashed)
+  const txPx = px(cfg.xThresh);
+  const tyPx = py(cfg.yThresh);
+  lines.push(`<line x1="${txPx}" y1="${PAD.top}" x2="${txPx}" y2="${PAD.top + CH}" stroke="#6b7280" stroke-width="1.5" stroke-dasharray="5,3" opacity="0.6"/>`);
+  lines.push(`<line x1="${PAD.left}" y1="${tyPx}" x2="${PAD.left + CW}" y2="${tyPx}" stroke="#6b7280" stroke-width="1.5" stroke-dasharray="5,3" opacity="0.6"/>`);
+  // Threshold labels
+  lines.push(`<text x="${txPx + 3}" y="${PAD.top + 11}" font-family="IBM Plex Mono,monospace" font-size="9" fill="#9ca3af">x=${cfg.xThresh}</text>`);
+  lines.push(`<text x="${PAD.left + 3}" y="${tyPx - 3}" font-family="IBM Plex Mono,monospace" font-size="9" fill="#9ca3af">y=${cfg.yThresh}</text>`);
+
+  // X ticks
+  const xSteps = 5;
+  for (let i = 0; i <= xSteps; i++) {
+    const v = xMin + (i / xSteps) * (xMax - xMin);
+    const xp = px(v);
+    lines.push(`<line x1="${xp}" y1="${PAD.top + CH}" x2="${xp}" y2="${PAD.top + CH + 5}" stroke="#9ca3af" stroke-width="1"/>`);
+    lines.push(`<text x="${xp}" y="${PAD.top + CH + 16}" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="9" fill="#9ca3af">${v.toFixed(1)}</text>`);
+  }
+  // Y ticks
+  const ySteps = 5;
+  for (let i = 0; i <= ySteps; i++) {
+    const v = yMin + (i / ySteps) * (yMax - yMin);
+    const yp = py(v);
+    lines.push(`<line x1="${PAD.left - 5}" y1="${yp}" x2="${PAD.left}" y2="${yp}" stroke="#9ca3af" stroke-width="1"/>`);
+    lines.push(`<text x="${PAD.left - 8}" y="${yp + 4}" text-anchor="end" font-family="IBM Plex Mono,monospace" font-size="9" fill="#9ca3af">${v.toFixed(1)}</text>`);
+  }
+
+  // Axis labels
+  const xLabelY = PAD.top + CH + 42;
+  lines.push(`<text x="${PAD.left + CW / 2}" y="${xLabelY}" text-anchor="middle" font-family="IBM Plex Sans,sans-serif" font-size="10" fill="#4b5563">${cfg.xLabel}</text>`);
+  lines.push(`<text transform="translate(13,${PAD.top + CH / 2}) rotate(-90)" text-anchor="middle" font-family="IBM Plex Sans,sans-serif" font-size="10" fill="#4b5563">${cfg.yLabel}</text>`);
+
+  // Good-corner star
+  const stars = { 'left-top': [0, 1], 'right-top': [1, 1], 'left-bot': [0, 0], 'right-mid': [1, 0.5] };
+  if (cfg.goodCorner && stars[cfg.goodCorner]) {
+    const [sfx, sfy] = stars[cfg.goodCorner];
+    const sx = PAD.left + sfx * CW + (sfx < 0.5 ? 14 : -14);
+    const sy = PAD.top  + (1 - sfy) * CH + (sfy > 0.5 ? 14 : -14);
+    lines.push(`<text x="${sx}" y="${sy}" text-anchor="middle" font-size="16" opacity="0.5">⭐</text>`);
+    lines.push(`<text x="${sx}" y="${sy + 13}" text-anchor="middle" font-family="IBM Plex Sans,sans-serif" font-size="9" fill="#16a34a" font-weight="700">ideal</text>`);
+  }
+
+  // Crosshair + dot
+  const dotX = px(xVal), dotY = py(yVal);
+  lines.push(`<line x1="${dotX}" y1="${PAD.top}" x2="${dotX}" y2="${PAD.top + CH}" stroke="#2563eb" stroke-width="1" stroke-dasharray="3,2" opacity="0.4"/>`);
+  lines.push(`<line x1="${PAD.left}" y1="${dotY}" x2="${PAD.left + CW}" y2="${dotY}" stroke="#2563eb" stroke-width="1" stroke-dasharray="3,2" opacity="0.4"/>`);
+  lines.push(`<circle cx="${dotX}" cy="${dotY}" r="9" fill="#2563eb" opacity="0.15"/>`);
+  lines.push(`<circle cx="${dotX}" cy="${dotY}" r="5" fill="#2563eb"/>`);
+  lines.push(`<circle cx="${dotX}" cy="${dotY}" r="5" fill="none" stroke="white" stroke-width="1.5"/>`);
+
+  // Coordinate label near dot
+  const labelX = dotX + 10;
+  const labelY = dotY - 10;
+  lines.push(`<rect x="${labelX - 2}" y="${labelY - 11}" width="72" height="15" rx="3" fill="white" opacity="0.85"/>`);
+  lines.push(`<text x="${labelX}" y="${labelY}" font-family="IBM Plex Mono,monospace" font-size="10" fill="#1e293b" font-weight="600">(${cfg.axes.x}=${cfg.sliders.x.fmt(xVal)}, ${cfg.axes.y}=${cfg.sliders.y.fmt(yVal)})</text>`);
+
+  svg.innerHTML = lines.join('\n');
+}
+
+// =====================================================================
+//  Interpretation logic
+// =====================================================================
+function getInterpEl_Tr(x, y, cfg) {
+  const low = x <= cfg.xThresh, high = y >= cfg.yThresh;
+  if (low && high)  return { cls: 'good',    h: '✓ Ideal', p: 'Low overhead AND high acceptance. AI is genuinely helping and trusted.' };
+  if (low && !high) return { cls: 'warn',    h: '⚠ Automation Bias?', p: 'Efficient but low acceptance. Humans may be bypassing or ignoring AI suggestions.' };
+  if (!low && high) return { cls: 'warn',    h: '⚠ Costly Trust', p: 'AI is accepted but integration is creating overhead. Optimize latency or workflow.' };
+  return                   { cls: 'danger',  h: '✗ Breakdown', p: 'High overhead AND low acceptance. AI is adding friction without delivering value.' };
+}
+
+function getInterpHcl_F(x, y, cfg) {
+  const highX = x >= cfg.xThresh;
+  const highY = y >= cfg.yThresh;
+  if (highX && !highY) return { cls: 'warn',    h: '⚠ Disengaged', p: 'Human is comfortable (low load) but barely interacting. Possible automation bias or UI barrier.' };
+  if (highX && highY)  return { cls: 'good',    h: '✓ Comfortable & Active', p: 'Low cognitive load with moderate-to-high interaction rate. Good balance.' };
+  if (!highX && highY) return { cls: 'danger',  h: '✗ Overloaded', p: 'High interaction rate with high cognitive load. Reduce interaction density or simplify AI outputs.' };
+  return                      { cls: 'warn',    h: '⚠ Struggling', p: 'High cognitive load and low interaction. Human is overwhelmed but not engaging.' };
+}
+
+function getInterpA_Tr(x, y, cfg) {
+  const posA = x >= cfg.xThresh, highTr = y >= cfg.yThresh;
+  if (posA && highTr)  return { cls: 'good',    h: '✓ Growing Trust', p: 'High trust that is still increasing. Ideal trajectory.' };
+  if (posA && !highTr) return { cls: 'warn',    h: '⚠ Rising from Low', p: 'Trust is building but currently low. Monitor if it reaches acceptable levels.' };
+  if (!posA && highTr) return { cls: 'warn',    h: '⚠ Eroding Trust', p: 'Currently high trust but declining over the session. Investigate AI consistency.' };
+  return                      { cls: 'danger',  h: '✗ Abandonment', p: 'Low trust that is declining further. AI not delivering perceived value.' };
+}
+
+function getInterpEl_Hcl(x, y, cfg) {
+  const lowEl = x <= cfg.xThresh, highHcl = y >= cfg.yThresh;
+  if (lowEl && highHcl)  return { cls: 'good',    h: '✓ Genuine Efficiency', p: 'AI reduces overhead without burdening the human. True collaboration benefit.' };
+  if (lowEl && !highHcl) return { cls: 'danger',  h: '✗ False Efficiency', p: 'Low overhead but high cognitive load. Speed gains at the cost of human strain — unsustainable.' };
+  if (!lowEl && highHcl) return { cls: 'neutral',  h: '— Wasted Capacity', p: 'Human is comfortable but AI adds overhead. Focus on reducing EL.' };
+  return                        { cls: 'warn',    h: '⚠ Burden', p: 'High overhead AND high cognitive load. AI is actively hurting the workflow.' };
+}
+
+function getInterpS_A(x, y, cfg) {
+  const highS = x >= cfg.xThresh, posA = y >= cfg.yThresh;
+  if (highS && posA)  return { cls: 'good',    h: '✓ Valid Simulation, Trust Growing', p: 'Surrogate faithfully replicates human behavior AND trust is improving. Results trustworthy.' };
+  if (highS && !posA) return { cls: 'warn',    h: '⚠ Valid Sim, Trust Eroding', p: 'Simulation is valid but AI trust is declining. Investigate AI quality.' };
+  if (!highS && posA) return { cls: 'danger',  h: '✗ Unreliable Simulation', p: 'Surrogate diverges from real humans. Any positive A result is suspect.' };
+  return                     { cls: 'danger',  h: '✗ Double Failure', p: 'Surrogate is unreliable AND trust is declining. Results meaningless.' };
+}
+
+const INTERP_FNS = {
+  'el-tr': getInterpEl_Tr,
+  'hcl-f': getInterpHcl_F,
+  'a-tr':  getInterpA_Tr,
+  'el-hcl': getInterpEl_Hcl,
+  's-a':   getInterpS_A
+};
+
+function updateInterpBox(tabId, i) {
+  const cls = ['good','warn','danger','neutral'][['good','warn','danger','neutral'].indexOf(i.cls)] || 'neutral';
+  document.getElementById('interp-' + tabId).innerHTML = `
+    <div class="interp-box ${i.cls}">
+      <h4>${i.h}</h4>
+      <p>${i.p}</p>
+    </div>`;
+}
+
+// =====================================================================
+//  Main update function
+// =====================================================================
+function updatePlot(tabId) {
+  const { x, y } = getMetricValues(tabId);
+  drawQuadrant(tabId, x, y);
+  const interp = INTERP_FNS[tabId](x, y, CONFIGS[tabId]);
+  updateInterpBox(tabId, interp);
+}
+
+// =====================================================================
+//  Init — draw all tabs, focus on first
+// =====================================================================
+window.addEventListener('load', () => {
+  Object.keys(CONFIGS).forEach(id => {
+    const sv = document.getElementById('svg-' + id);
+    if (sv) {
+      getMetricValues(id);
+      updatePlot(id);
+    }
+  });
+});
+</script>
+</body>
+</html>
