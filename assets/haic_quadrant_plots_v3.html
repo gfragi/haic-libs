@@ -29,6 +29,7 @@
     --tab-active-text: #ffffff;
     --shadow: 0 1px 4px rgba(0,0,0,0.08), 0 4px 16px rgba(0,0,0,0.04);
     --radius: 10px;
+    --shell-width: 1440px;
   }
 
   body {
@@ -40,7 +41,7 @@
   }
 
   .page-header {
-    max-width: 1100px;
+    max-width: var(--shell-width);
     margin: 0 auto 24px;
   }
   .page-header h1 {
@@ -69,7 +70,7 @@
   .tab-bar {
     display: flex;
     gap: 4px;
-    max-width: 1100px;
+    max-width: var(--shell-width);
     margin: 0 auto 20px;
     background: var(--surface);
     border: 1px solid var(--border);
@@ -103,9 +104,9 @@
   /* Layout */
   .panel-grid {
     display: grid;
-    grid-template-columns: 340px 1fr 260px;
-    gap: 16px;
-    max-width: 1100px;
+    grid-template-columns: minmax(360px, 420px) minmax(520px, 1.4fr) minmax(280px, 340px);
+    gap: 18px;
+    max-width: var(--shell-width);
     margin: 0 auto;
   }
 
@@ -276,6 +277,26 @@
     text-transform: uppercase;
     letter-spacing: 0.5px;
     margin-bottom: 8px;
+  }
+
+  @media (max-width: 1200px) {
+    .panel-grid {
+      grid-template-columns: minmax(320px, 1fr) minmax(420px, 1.15fr);
+    }
+    .panel-grid > .card:last-child {
+      grid-column: 1 / -1;
+    }
+  }
+
+  @media (max-width: 900px) {
+    body { padding: 16px; }
+    .tab-btn { min-width: 120px; }
+    .panel-grid {
+      grid-template-columns: 1fr;
+    }
+    .panel-grid > .card:last-child {
+      grid-column: auto;
+    }
   }
 </style>
 </head>
