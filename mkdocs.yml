@@ -49,6 +49,8 @@ nav:
   - API reference: api.md
 
 markdown_extensions:
+  - md_in_html
+  - attr_list
   - admonition
   - pymdownx.superfences
   - pymdownx.tabbed:

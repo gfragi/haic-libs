@@ -419,6 +419,20 @@ the human (low HCL). EL × HCL separates genuine efficiency from human-costly sp
 When S is below threshold, do not interpret F, EL, HCL, Tr, or A from that simulation.
 S is the validity gate that must pass before trusting any other metric.
 
+
+ ## Live Quadrant Diagnostic Tool
+
+Adjust the sliders to explore how metric pairs map to the four interpretive zones.
+
+<div style="border: 1px solid #e2e6ea; border-radius: 10px; overflow: hidden; margin: 24px 0;">
+  <iframe 
+    src="../assets/quadrant_plots.html"
+    width="100%" 
+    height="780"
+    style="border: none; display: block;"
+    title="HAIC Quadrant Diagnostic Plots">
+  </iframe>
+</div>
 ---
 
 ## Common errors and fixes
