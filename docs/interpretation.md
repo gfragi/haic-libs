@@ -425,13 +425,13 @@ S is the validity gate that must pass before trusting any other metric.
 Adjust the sliders to explore how metric pairs map to the four interpretive zones.
 
 <div style="border: 1px solid #e2e6ea; border-radius: 10px; overflow: hidden; margin: 24px 0;">
-  <iframe 
-    src="assets/haic_quadrant_plots_v3.html"
-    width="100%" 
-    height="780"
-    style="border: none; display: block;"
-    title="HAIC Quadrant Diagnostic Plots">
-  </iframe>
+    <iframe
+        src="../assets/haic_quadrant_plots_v3.html"
+        width="100%"
+        height="1100"
+        style="border:none; display:block;"
+        title="HAIC Quadrant Diagnostic Plots">
+    </iframe>
 </div>
 ---
 
