@@ -1,0 +1,1852 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Open-source Python library for Human-AI Collaboration evaluation">
+      
+      
+      
+        <link rel="canonical" href="https://gfragi.github.io/haic-libs/interpretation/">
+      
+      
+        <link rel="prev" href="../metrics/">
+      
+      
+        <link rel="next" href="../integration/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>Interpretation guide - haic-libs</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/_mkdocstrings.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="teal">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#metric-interpretation-guide" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="haic-libs" class="md-header__button md-logo" aria-label="haic-libs" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            haic-libs
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Interpretation guide
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="teal"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="teal"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/gfragi/haic-libs" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    gfragi/haic-libs
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href=".." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../concepts/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Concepts
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../metrics/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Metrics
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    <li class="md-tabs__item md-tabs__item--active">
+      <a href="./" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Interpretation guide
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../integration/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Integration guide
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../api/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  API reference
+
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="haic-libs" class="md-nav__button md-logo" aria-label="haic-libs" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    haic-libs
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/gfragi/haic-libs" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    gfragi/haic-libs
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../concepts/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Concepts
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../metrics/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Metrics
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Interpretation guide
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Interpretation guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#before-you-interpret-three-things-you-must-set" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Before you interpret: three things you must set
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Before you interpret: three things you must set">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#baseline_s-the-el-anchor" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        baseline_s — the EL anchor
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rt_max_s-the-hcl-ceiling" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        rt_max_s — the HCL ceiling
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#actor_typesystem-what-to-exclude" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        actor_type="system" — what to exclude
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#metric-by-metric-derivations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Metric-by-metric derivations
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Metric-by-metric derivations">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#el-effort-loss" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        EL — Effort Loss
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#d-mean-decision-duration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        D — Mean Decision Duration
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#f-interaction-frequency" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        F — Interaction Frequency
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hcl-human-centeredness" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        HCL — Human-Centeredness
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tr-trust-proxy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tr — Trust Proxy
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#a-adaptability" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        A — Adaptability
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#s-surrogate-similarity" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        S — Surrogate Similarity
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#efficiencyscore-the-composite" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        EfficiencyScore — the composite
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#quadrant-diagnostics" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Quadrant diagnostics
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Quadrant diagnostics">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#el-tr-efficiency-trust" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        EL × Tr — Efficiency × Trust
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hcl-f-cognitive-load-frequency" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        HCL × F — Cognitive Load × Frequency
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#a-tr-adaptability-trust" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        A × Tr — Adaptability × Trust
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#el-hcl-overhead-cognitive-load" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        EL × HCL — Overhead × Cognitive Load
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#s-a-surrogate-similarity-adaptability" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        S × A — Surrogate Similarity × Adaptability
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#common-errors-and-fixes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Common errors and fixes
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#reference" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Reference
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../integration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Integration guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../api/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#before-you-interpret-three-things-you-must-set" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Before you interpret: three things you must set
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Before you interpret: three things you must set">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#baseline_s-the-el-anchor" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        baseline_s — the EL anchor
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rt_max_s-the-hcl-ceiling" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        rt_max_s — the HCL ceiling
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#actor_typesystem-what-to-exclude" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        actor_type="system" — what to exclude
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#metric-by-metric-derivations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Metric-by-metric derivations
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Metric-by-metric derivations">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#el-effort-loss" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        EL — Effort Loss
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#d-mean-decision-duration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        D — Mean Decision Duration
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#f-interaction-frequency" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        F — Interaction Frequency
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hcl-human-centeredness" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        HCL — Human-Centeredness
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tr-trust-proxy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tr — Trust Proxy
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#a-adaptability" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        A — Adaptability
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#s-surrogate-similarity" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        S — Surrogate Similarity
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#efficiencyscore-the-composite" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        EfficiencyScore — the composite
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#quadrant-diagnostics" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Quadrant diagnostics
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Quadrant diagnostics">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#el-tr-efficiency-trust" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        EL × Tr — Efficiency × Trust
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hcl-f-cognitive-load-frequency" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        HCL × F — Cognitive Load × Frequency
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#a-tr-adaptability-trust" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        A × Tr — Adaptability × Trust
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#el-hcl-overhead-cognitive-load" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        EL × HCL — Overhead × Cognitive Load
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#s-a-surrogate-similarity-adaptability" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        S × A — Surrogate Similarity × Adaptability
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#common-errors-and-fixes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Common errors and fixes
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#reference" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Reference
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="metric-interpretation-guide">Metric Interpretation Guide<a class="headerlink" href="#metric-interpretation-guide" title="Permanent link">&para;</a></h1>
+<p>This page explains <strong>why</strong> each HAIC metric is defined the way it is, how to interpret
+values in practice, and how to use the five quadrant diagnostic plots to diagnose
+collaboration quality. It is the companion to the <a href="../metrics/">Metrics reference</a>.</p>
+<hr />
+<h2 id="before-you-interpret-three-things-you-must-set">Before you interpret: three things you must set<a class="headerlink" href="#before-you-interpret-three-things-you-must-set" title="Permanent link">&para;</a></h2>
+<p>Every metric interpretation depends on two global parameters you define per session.
+Getting these wrong is the most common source of misleading results.</p>
+<h3 id="baseline_s-the-el-anchor"><code>baseline_s</code> — the EL anchor<a class="headerlink" href="#baseline_s-the-el-anchor" title="Permanent link">&para;</a></h3>
+<p>EL measures overhead <em>relative to something</em>. That something is <code>baseline_s</code>: the
+expected task duration without AI assistance (or with a previous, simpler system).</p>
+<table>
+<thead>
+<tr>
+<th>How to set it</th>
+<th>When to use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Measure directly (time users on the task pre-deployment)</td>
+<td>You have a pre-AI baseline</td>
+</tr>
+<tr>
+<td>Let haic-metrics auto-derive as P95 of <code>duration_s</code></td>
+<td>You have ≥ 10 human observations and no external baseline</td>
+</tr>
+</tbody>
+</table>
+<p>Always state which approach you used. The two methods can produce different EL values
+for the same data.</p>
+<h3 id="rt_max_s-the-hcl-ceiling"><code>rt_max_s</code> — the HCL ceiling<a class="headerlink" href="#rt_max_s-the-hcl-ceiling" title="Permanent link">&para;</a></h3>
+<p>HCL normalises reaction time against a maximum. <code>rt_max_s</code> defines what "fully loaded"
+looks like for your task type.</p>
+<table>
+<thead>
+<tr>
+<th>Task type</th>
+<th>Typical <code>rt_max_s</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Real-time operator dashboard</td>
+<td>2–5 s</td>
+</tr>
+<tr>
+<td>Document Q&amp;A chatbot</td>
+<td>20–30 s</td>
+</tr>
+<tr>
+<td>Clinical decision support</td>
+<td>5–10 s</td>
+</tr>
+<tr>
+<td>Grid / energy management</td>
+<td>10–30 s</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition warning">
+<p class="admonition-title">The 60-second trap</p>
+<p>The default <code>rt_max_s=60</code> is almost always <strong>too high</strong> for deployed systems. A
+value that is too high produces artificially high HCL scores, making a cognitively
+demanding system appear comfortable. Always set this explicitly and justify the
+choice.</p>
+</div>
+<h3 id="actor_typesystem-what-to-exclude"><code>actor_type="system"</code> — what to exclude<a class="headerlink" href="#actor_typesystem-what-to-exclude" title="Permanent link">&para;</a></h3>
+<p>Events logged with <code>actor_type="system"</code> (automated pipeline steps, background
+processes, database queries) are <strong>excluded from all metric computations</strong>. Including
+them inflates F, distorts HCL with non-human latency values, and pollutes Tr with
+non-decision events. This exclusion happens automatically — log them freely for
+traceability, but do not expect them to appear in metric results.</p>
+<hr />
+<h2 id="metric-by-metric-derivations">Metric-by-metric derivations<a class="headerlink" href="#metric-by-metric-derivations" title="Permanent link">&para;</a></h2>
+<h3 id="el-effort-loss">EL — Effort Loss<a class="headerlink" href="#el-effort-loss" title="Permanent link">&para;</a></h3>
+<p><strong>The question:</strong> Does the AI add overhead, or does it save time?</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>EL = (t_actual − t_baseline) / t_baseline
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>t_actual   = mean human task duration in this session (seconds)
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>t_baseline = expected task duration without AI (seconds)
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>Range: [0, ∞)    EL cannot be negative (see note below)
+</code></pre></div>
+<p><strong>Why this formula?</strong>
+The ratio <code>(t_actual - t_baseline) / t_baseline</code> is a standard <em>relative change</em>
+calculation — the same form as percentage overhead. Normalising by <code>t_baseline</code> makes
+EL comparable across tasks with different natural durations (a 5-minute task and a
+5-second task are now on the same scale).</p>
+<p><strong>Why EL cannot be negative:</strong>
+The formula can mathematically produce a negative result when <code>t_actual &lt; t_baseline</code>
+(the AI genuinely saves time). In the HumAIne framework EL is defined as an <em>overhead</em>
+metric, not a benefit metric — negative overhead is clamped to zero. The time-saving
+benefit is captured by <code>EfficiencyScore</code> instead. This keeps the metric unambiguous: EL
+always means <em>cost</em>, never <em>gain</em>.</p>
+<p><strong>Reference values:</strong></p>
+<table>
+<thead>
+<tr>
+<th>EL</th>
+<th>Interpretation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0.0</td>
+<td>No overhead — AI does not slow the human down at all</td>
+</tr>
+<tr>
+<td>0.1–0.2</td>
+<td>Acceptable overhead for most deployed systems</td>
+</tr>
+<tr>
+<td>0.3–0.5</td>
+<td>Elevated — investigate AI latency and workflow friction</td>
+</tr>
+<tr>
+<td>&gt; 0.5</td>
+<td>High — AI is adding significant time cost</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h3 id="d-mean-decision-duration">D — Mean Decision Duration<a class="headerlink" href="#d-mean-decision-duration" title="Permanent link">&para;</a></h3>
+<p><strong>The question:</strong> On average, how much time does each decision take?</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>D = Σ(duration_s) / N
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>duration_s = time spent on each logged decision event
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>N          = total number of decision events
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>Range: [0, ∞)    Unit: seconds per decision
+</code></pre></div>
+<p>D is a raw speed metric with no baseline comparison. Its main use is <strong>comparing
+pipeline versions</strong> (v1 vs v2) or <strong>comparing interface conditions</strong> (2D vs XR). On its
+own D is ambiguous: fast decisions can mean clear AI output (good) or that the human
+has given up engaging (bad). Always read D alongside Tr.</p>
+<hr />
+<h3 id="f-interaction-frequency">F — Interaction Frequency<a class="headerlink" href="#f-interaction-frequency" title="Permanent link">&para;</a></h3>
+<p><strong>The question:</strong> How dense is the collaboration?</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>F = N / (T_session / 60)
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>N         = total interaction events in the session
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>T_session = total session duration in seconds
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>Range: [0, ∞)    Unit: interactions per minute
+</code></pre></div>
+<p><strong>F has no universal "good" direction</strong> — it is task-relative. High F is healthy in a
+real-time control room; the same F in a document Q&amp;A session may signal that users are
+confused and rephrasing repeatedly. F only becomes interpretable in combination with HCL
+(see <a href="#hcl-x-f--cognitive-load-x-frequency">quadrant HCL×F</a> below).</p>
+<p>Typical ranges by task type:</p>
+<table>
+<thead>
+<tr>
+<th>Task</th>
+<th>Typical F</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Conversational chatbot</td>
+<td>1–5 / min</td>
+</tr>
+<tr>
+<td>Operator dashboard</td>
+<td>5–20 / min</td>
+</tr>
+<tr>
+<td>Image annotation</td>
+<td>3–10 / min</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h3 id="hcl-human-centeredness">HCL — Human-Centeredness<a class="headerlink" href="#hcl-human-centeredness" title="Permanent link">&para;</a></h3>
+<p><strong>The question:</strong> How much cognitive load does the AI place on the human?</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>HCL = 1 − (RT / RT_max)
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>RT     = mean human reaction time to AI output (seconds)
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>RT_max = maximum expected reaction time for this task (= rt_max_s)
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>Range: [0, 1]
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>
+<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>HCL = 1.0  →  RT = 0       → human reacted instantly → minimal cognitive load
+<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>HCL = 0.5  →  RT = RT_max/2  → moderate load
+<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>HCL = 0.0  →  RT = RT_max  → human took maximum time → maximum load
+</code></pre></div>
+<p><strong>Why <code>1 − (RT / RT_max)</code> and not just RT?</strong></p>
+<p>Three reasons:</p>
+<ol>
+<li><strong>Inversion</strong>: Raw RT is higher-is-worse. HAIC metrics use higher-is-better
+   conventions for readability. Subtracting from 1 inverts the direction.</li>
+<li><strong>Normalisation</strong>: Dividing by <code>RT_max</code> removes task-specific scale — a 2-second RT
+   means something different for a chatbot vs a control room. After normalisation,
+   HCL=0.8 means the same thing across both.</li>
+<li><strong>Linearity</strong>: The <code>1 - x</code> transform keeps interpretation simple. HCL=0.8 literally
+   means "the human uses 20% of their available reaction budget." This is easy to
+   communicate.</li>
+</ol>
+<div class="admonition warning">
+<p class="admonition-title">HCL is inverted — this confuses everyone</p>
+<p><strong>High HCL = LOW cognitive load = good.</strong>
+<strong>Low HCL = HIGH cognitive load = bad.</strong>
+HCL=1 does not mean "maximum cognitive load." It means the human reacted instantly,
+which implies minimal load. Always label axes with directional arrows when presenting
+quadrant plots.</p>
+</div>
+<p><strong>Why is this called a "proxy"?</strong>
+Cognitive load cannot be measured from interaction logs alone — that would require EEG
+or physiological sensors. Reaction time <em>correlates</em> with cognitive load (longer RT →
+more processing difficulty), grounded in cognitive psychology research (Kahneman 2011;
+Wickens &amp; Hollands 2000). HCL is therefore an inference, not a direct measurement.</p>
+<hr />
+<h3 id="tr-trust-proxy">Tr — Trust Proxy<a class="headerlink" href="#tr-trust-proxy" title="Permanent link">&para;</a></h3>
+<p><strong>The question:</strong> Do humans accept AI suggestions, or do they override them?</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>Tr = n_accepted / n_total
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>n_accepted = AI suggestions the human accepted (correct=True)
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>n_total    = total AI suggestions
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>
+<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>Range: [0, 1]
+<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>
+<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>Tr = 1.0  →  human accepted every suggestion
+<a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a>Tr = 0.5  →  accepted half
+<a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a>Tr = 0.0  →  rejected every suggestion
+<a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a>Tr = None →  correct field was not logged (cannot compute)
+</code></pre></div>
+<p><strong>Why "behavioral proxy" and not "trust"?</strong>
+Trust is a psychological construct that cannot be read from logs. What is observable is
+<em>acceptance behavior</em> — the downstream consequence of trust. The relationship is not
+1:1: high Tr with poor AI quality indicates automation bias (over-trust). Low Tr with
+high AI quality indicates a trust deficit (under-trust). Tr must always be interpreted
+alongside accuracy metrics (RAGAS Faithfulness, ground-truth correctness rates).</p>
+<p><strong>Operationalising acceptance:</strong>
+In a chatbot, you must define what counts as "accepted." Common definitions:</p>
+<ul>
+<li>User did not rephrase the query within N seconds</li>
+<li>User clicked a positive feedback button</li>
+<li>User moved to the next task without modifying the answer</li>
+</ul>
+<p>The definition must be stated in any evaluation report — different definitions produce
+different Tr values from identical sessions.</p>
+<hr />
+<h3 id="a-adaptability">A — Adaptability<a class="headerlink" href="#a-adaptability" title="Permanent link">&para;</a></h3>
+<p><strong>The question:</strong> Is trust growing or eroding over the course of a session?</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>A = tanh( (Acc_late − Acc_early) / Acc_early )
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>Acc_early = acceptance rate in the first 20% of session decisions
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>Acc_late  = acceptance rate in the last 20% of session decisions
+<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>
+<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>Range: [-1, +1]
+<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a>
+<a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a>A &gt; 0  →  trust improving
+<a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a>A = 0  →  no change
+<a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a>A &lt; 0  →  trust eroding
+</code></pre></div>
+<p><strong>Why 20% windows instead of halves?</strong>
+Comparing the first half to the second half includes noisy mid-session behaviour.
+Taking the first 20% (when users are most uncertain) and last 20% (when patterns have
+stabilised) captures the full arc of adaptation while avoiding mid-session noise. With
+20 decisions: Acc_early covers decisions 1–4, Acc_late covers decisions 17–20.</p>
+<p><strong>Why <code>tanh</code>?</strong>
+The raw ratio <code>(Acc_late − Acc_early) / Acc_early</code> is unbounded — if Acc_early is 0.05
+and Acc_late is 0.30, the ratio is 5.0. <code>tanh</code> compresses any real number to <code>(-1, +1)</code>
+smoothly and differentiably, preserving sign and relative magnitude without a hard clip.
+It is a standard choice when you need a bounded output that scales gracefully with
+extreme inputs.</p>
+<p><strong>When A is unreliable:</strong>
+A requires enough decisions to form meaningful 20% windows. With fewer than 10 decisions
+per session, a single override can produce a dramatically negative A. Flag A as
+potentially unreliable when <code>n &lt; 10</code> decisions per session.</p>
+<hr />
+<h3 id="s-surrogate-similarity">S — Surrogate Similarity<a class="headerlink" href="#s-surrogate-similarity" title="Permanent link">&para;</a></h3>
+<p><strong>The question:</strong> When using a synthetic agent, how faithfully does it replicate real human behavior?</p>
+<div class="admonition info">
+<p class="admonition-title">Simulation contexts only</p>
+<p>S is only meaningful when you have replaced real human participants with a surrogate
+(synthetic) agent. Do not compute or report S in real-user studies.</p>
+</div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>Discrete variant:
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>  S = n_matching / n_total
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>  (proportion of events where surrogate action == real human action)
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>
+<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>Probabilistic variant:
+<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>  S = 1 − JSD(p_surrogate ∥ p_human)
+<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a>  (JSD = Jensen-Shannon Divergence, bounded [0, 1])
+<a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a>
+<a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a>Range: [0, 1]   S = 1.0 → perfect match   S = 0.0 → completely divergent
+</code></pre></div>
+<p><strong>Why JSD and not KL-divergence?</strong>
+KL-divergence is asymmetric: <code>KL(p‖q) ≠ KL(q‖p)</code>. There is no natural "reference
+distribution" — neither human nor surrogate is inherently the ground truth for the
+purpose of the comparison. JSD is symmetric by construction, making it appropriate
+for comparing two distributions without privileging one.</p>
+<p><strong>S as a validity gate:</strong>
+When S is low, no other metric computed from that simulation should be trusted. S must
+pass a minimum threshold (typically S ≥ 0.6) before interpreting A, EL, Tr, HCL, or F
+from surrogate-generated data.</p>
+<hr />
+<h2 id="efficiencyscore-the-composite">EfficiencyScore — the composite<a class="headerlink" href="#efficiencyscore-the-composite" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>EfficiencyScore = clip(
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>    base × (1 − 0.35 × off_role_rate) × (1 + 0.10 × progress_rate),
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>    0, 1
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>)
+<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>
+<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a>base          = 1 / (1 + EL)
+<a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a>off_role_rate = fraction of events where actor acted outside their expected role
+<a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a>progress_rate = fraction of tasks completed successfully
+</code></pre></div>
+<p><strong>Component breakdown:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>Effect</th>
+<th>Rationale</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>base = 1/(1+EL)</code></td>
+<td>[0,1], decreasing in EL</td>
+<td>Converts unbounded EL to bounded efficiency</td>
+</tr>
+<tr>
+<td><code>1 - 0.35×off_role_rate</code></td>
+<td>Up to −35% penalty</td>
+<td>Captures role integrity violations</td>
+</tr>
+<tr>
+<td><code>1 + 0.10×progress_rate</code></td>
+<td>Up to +10% bonus</td>
+<td>Small bonus for task completion</td>
+</tr>
+<tr>
+<td><code>clip(·, 0, 1)</code></td>
+<td>Keeps result in [0,1]</td>
+<td>Prevents artefacts from edge cases</td>
+</tr>
+</tbody>
+</table>
+<p>The 0.35 and 0.10 coefficients reflect that role integrity has a larger impact on
+collaboration quality than raw task completion rate — a system that completes tasks by
+violating role boundaries is more problematic than one that completes fewer tasks
+correctly.</p>
+<hr />
+<h2 id="quadrant-diagnostics">Quadrant diagnostics<a class="headerlink" href="#quadrant-diagnostics" title="Permanent link">&para;</a></h2>
+<p>A quadrant plot places two metrics on X and Y axes, divides the space at threshold
+values, and reveals which collaboration regime a system occupies. The five standard
+quadrant combinations are described below.</p>
+<p>Each combination answers a different diagnostic question. Use
+<a href="https://gfragi.github.io/haic-libs/quadrant-plots">haic_quadrant_plots_v3.html</a> for
+interactive exploration.</p>
+<hr />
+<h3 id="el-tr-efficiency-trust">EL × Tr — Efficiency × Trust<a class="headerlink" href="#el-tr-efficiency-trust" title="Permanent link">&para;</a></h3>
+<p><strong>Thresholds:</strong> EL ≤ 0.3 (low overhead), Tr ≥ 0.5 (moderate acceptance).
+<strong>Good corner:</strong> lower-left (low EL, high Tr).</p>
+<table>
+<thead>
+<tr>
+<th>Zone</th>
+<th>EL</th>
+<th>Tr</th>
+<th>Label</th>
+<th>Implication</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Lower-left ⭐</td>
+<td>Low</td>
+<td>High</td>
+<td><strong>Ideal</strong></td>
+<td>AI saves time and is trusted. Monitor for automation bias if Tr → 1.0 with low AI accuracy.</td>
+</tr>
+<tr>
+<td>Upper-left</td>
+<td>Low</td>
+<td>Low</td>
+<td><strong>Automation bias risk</strong></td>
+<td>Efficient but not trusted. Humans may be ignoring AI despite its speed. Investigate AI quality and user familiarity.</td>
+</tr>
+<tr>
+<td>Lower-right</td>
+<td>High</td>
+<td>High</td>
+<td><strong>Costly trust</strong></td>
+<td>Trusted but slow. Good model, poor deployment. Fix inference latency and workflow integration.</td>
+</tr>
+<tr>
+<td>Upper-right</td>
+<td>High</td>
+<td>Low</td>
+<td><strong>Breakdown</strong></td>
+<td>High overhead AND low trust. AI adds friction without value. Redesign or remove.</td>
+</tr>
+</tbody>
+</table>
+<p>This is the first quadrant to examine for any RAG or assistant system.</p>
+<hr />
+<h3 id="hcl-f-cognitive-load-frequency">HCL × F — Cognitive Load × Frequency<a class="headerlink" href="#hcl-f-cognitive-load-frequency" title="Permanent link">&para;</a></h3>
+<p><strong>Thresholds:</strong> HCL ≥ 0.5 (comfortable), F ≥ 5/min (active).
+<strong>Good area:</strong> right side (high HCL); optimal F is task-dependent.</p>
+<div class="admonition warning">
+<p class="admonition-title">Axis direction</p>
+<p>The X-axis runs: <strong>← high cognitive load  ·  HCL  ·  low cognitive load →</strong>
+Always label with directional arrows. High HCL is on the RIGHT.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th>Zone</th>
+<th>HCL</th>
+<th>F</th>
+<th>Label</th>
+<th>Implication</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Right, moderate F</td>
+<td>High</td>
+<td>Moderate</td>
+<td><strong>Comfortable &amp; active</strong></td>
+<td>Low load with natural pace. Ideal for most systems.</td>
+</tr>
+<tr>
+<td>Right, low F</td>
+<td>High</td>
+<td>Low</td>
+<td><strong>Disengaged</strong></td>
+<td>Comfortable but barely interacting. Check for automation bias or sessions too simple to require interaction.</td>
+</tr>
+<tr>
+<td>Left, high F</td>
+<td>Low</td>
+<td>High</td>
+<td><strong>Overloaded</strong></td>
+<td>Rapid interactions with high cognitive strain. Reduce interaction density immediately.</td>
+</tr>
+<tr>
+<td>Left, low F</td>
+<td>Low</td>
+<td>Low</td>
+<td><strong>Struggling silently</strong></td>
+<td>High load, low interaction. Users may have abandoned the task. Most dangerous zone.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h3 id="a-tr-adaptability-trust">A × Tr — Adaptability × Trust<a class="headerlink" href="#a-tr-adaptability-trust" title="Permanent link">&para;</a></h3>
+<p><strong>Thresholds:</strong> A ≥ 0 (improving), Tr ≥ 0.5 (moderate trust).
+<strong>Good corner:</strong> right side (positive A), high Tr.</p>
+<table>
+<thead>
+<tr>
+<th>Zone</th>
+<th>A</th>
+<th>Tr</th>
+<th>Label</th>
+<th>Implication</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Positive, high Tr ⭐</td>
+<td>Positive</td>
+<td>High</td>
+<td><strong>Growing trust</strong></td>
+<td>Trust is building and currently strong. Ideal trajectory.</td>
+</tr>
+<tr>
+<td>Positive, low Tr</td>
+<td>Positive</td>
+<td>Low</td>
+<td><strong>Rising from low</strong></td>
+<td>Trust improving but currently insufficient. Monitor over time.</td>
+</tr>
+<tr>
+<td>Negative, high Tr</td>
+<td>Negative</td>
+<td>High</td>
+<td><strong>Eroding trust</strong></td>
+<td>High current trust but declining. Investigate AI consistency and quality under load.</td>
+</tr>
+<tr>
+<td>Negative, low Tr</td>
+<td>Negative</td>
+<td>Low</td>
+<td><strong>Abandonment</strong></td>
+<td>Low trust that is declining further. Most urgent action needed.</td>
+</tr>
+</tbody>
+</table>
+<p>Note: high Tr is not always correct. If Tr=0.95 but ground-truth accuracy is 0.60,
+users are over-trusting a bad AI. Always cross-reference with accuracy metrics.</p>
+<hr />
+<h3 id="el-hcl-overhead-cognitive-load">EL × HCL — Overhead × Cognitive Load<a class="headerlink" href="#el-hcl-overhead-cognitive-load" title="Permanent link">&para;</a></h3>
+<p><strong>Thresholds:</strong> EL ≤ 0.3 (low overhead), HCL ≥ 0.5 (comfortable).
+<strong>Good corner:</strong> lower-left (low EL, high HCL).</p>
+<p>This quadrant catches <strong>false efficiency</strong> — a failure mode invisible to EL × Tr.
+A system can appear efficient (low EL) while achieving that speed by overloading
+the human (low HCL). EL × HCL separates genuine efficiency from human-costly speed.</p>
+<table>
+<thead>
+<tr>
+<th>Zone</th>
+<th>EL</th>
+<th>HCL</th>
+<th>Label</th>
+<th>Implication</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Lower-left ⭐</td>
+<td>Low</td>
+<td>High</td>
+<td><strong>Genuine efficiency</strong></td>
+<td>AI reduces overhead without burdening the human. Sustainable.</td>
+</tr>
+<tr>
+<td>Upper-left</td>
+<td>Low</td>
+<td>Low</td>
+<td><strong>False efficiency</strong></td>
+<td>Speed gained at the cost of human strain. Unsustainable. Improve output clarity.</td>
+</tr>
+<tr>
+<td>Lower-right</td>
+<td>High</td>
+<td>High</td>
+<td><strong>Wasted capacity</strong></td>
+<td>Human is comfortable but AI is slow or unnecessary. Optimise latency.</td>
+</tr>
+<tr>
+<td>Upper-right</td>
+<td>High</td>
+<td>Low</td>
+<td><strong>Burden</strong></td>
+<td>High overhead AND high cognitive load. Immediate redesign warranted.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h3 id="s-a-surrogate-similarity-adaptability">S × A — Surrogate Similarity × Adaptability<a class="headerlink" href="#s-a-surrogate-similarity-adaptability" title="Permanent link">&para;</a></h3>
+<div class="admonition info">
+<p class="admonition-title">Simulation contexts only</p>
+<p>This quadrant only applies when using surrogate agents. It validates whether
+simulation results can be trusted before interpreting any other metrics.</p>
+</div>
+<p><strong>Thresholds:</strong> S ≥ 0.6 (valid simulation), A ≥ 0 (improving).
+<strong>Good corner:</strong> right side (high S), positive A.</p>
+<table>
+<thead>
+<tr>
+<th>Zone</th>
+<th>S</th>
+<th>A</th>
+<th>Label</th>
+<th>Implication</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>High S, positive A ⭐</td>
+<td>High</td>
+<td>Positive</td>
+<td><strong>Valid &amp; improving</strong></td>
+<td>Surrogate is faithful and trust is growing. Results are trustworthy.</td>
+</tr>
+<tr>
+<td>High S, negative A</td>
+<td>High</td>
+<td>Negative</td>
+<td><strong>Valid, eroding trust</strong></td>
+<td>Simulation is valid but AI trust is declining. Investigate AI quality.</td>
+</tr>
+<tr>
+<td>Low S, any A</td>
+<td>Low</td>
+<td>Any</td>
+<td><strong>Invalid simulation</strong></td>
+<td>Surrogate does not match real humans. All other metrics from this run are suspect.</td>
+</tr>
+</tbody>
+</table>
+<p>When S is below threshold, do not interpret F, EL, HCL, Tr, or A from that simulation.
+S is the validity gate that must pass before trusting any other metric.</p>
+<hr />
+<h2 id="common-errors-and-fixes">Common errors and fixes<a class="headerlink" href="#common-errors-and-fixes" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Situation</th>
+<th>Symptom</th>
+<th>Cause</th>
+<th>Fix</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>EL &lt; 0</code></td>
+<td>Negative EL</td>
+<td>AI saved time (<code>t_actual &lt; t_baseline</code>)</td>
+<td>Clamp to 0; note time saving separately</td>
+</tr>
+<tr>
+<td><code>Tr = None</code></td>
+<td>Tr not computed</td>
+<td><code>correct</code> field missing from human events</td>
+<td>Add <code>correct=True/False</code> to <code>log_decision</code> for human events</td>
+</tr>
+<tr>
+<td><code>HCL &gt; 1</code></td>
+<td>HCL exceeds 1.0</td>
+<td><code>rt_max_s</code> too low; some RT &gt; ceiling</td>
+<td>Increase <code>rt_max_s</code> to cover ≥ P95 of observed RTs</td>
+</tr>
+<tr>
+<td><code>HCL ≈ 1</code> always</td>
+<td>Suspiciously perfect HCL</td>
+<td><code>rt_max_s</code> too high</td>
+<td>Lower <code>rt_max_s</code> to a realistic task ceiling</td>
+</tr>
+<tr>
+<td><code>A = None</code></td>
+<td>A not computed</td>
+<td>Fewer than 2 decisions in early/late window</td>
+<td>Ensure ≥ 10 decisions per session; flag A as unreliable otherwise</td>
+</tr>
+<tr>
+<td>F very high</td>
+<td>Hundreds of events/min</td>
+<td>System events included</td>
+<td>Filter <code>actor_type="system"</code> — excluded automatically by haic-metrics</td>
+</tr>
+<tr>
+<td>S computed, real users</td>
+<td>S reported in real-user study</td>
+<td>Misapplication</td>
+<td>S is simulation-only; remove from results</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="reference">Reference<a class="headerlink" href="#reference" title="Permanent link">&para;</a></h2>
+<p>Fragiadakis et al. (2025). <em>Evaluating Human-AI Collaboration: A Review and
+Methodological Framework</em>. <a href="https://arxiv.org/abs/2407.19098">arXiv:2407.19098</a></p>
+<p>HumAIne Horizon Europe project, Grant No. 101120218.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      MIT License — HumAIne Horizon Europe project (Grant No. 101120218)
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.tabs", "navigation.sections", "navigation.top", "content.code.copy", "content.code.annotate"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

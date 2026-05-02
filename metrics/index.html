@@ -16,7 +16,7 @@
         <link rel="prev" href="../concepts/">
       
       
-        <link rel="next" href="../integration/">
+        <link rel="next" href="../interpretation/">
       
       
         
@@ -71,7 +71,7 @@
     
     
     
-    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="teal">
   
     
     <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
@@ -127,7 +127,7 @@
     
     
     
-    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="teal"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
     
       <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
@@ -137,7 +137,7 @@
     
     
     
-    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="teal"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
     
       <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
@@ -272,6 +272,25 @@
     
   
   Metrics
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../interpretation/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Interpretation guide
 
       </a>
     </li>
@@ -569,10 +588,48 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#going-deeper" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Going deeper
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
       
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../interpretation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Interpretation guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
     </li>
   
 
@@ -745,6 +802,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#going-deeper" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Going deeper
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -799,9 +867,9 @@
 <tr>
 <td>Human-Centeredness</td>
 <td>HCL</td>
-<td>1 / (1 + mean human <code>duration_s</code>)</td>
-<td>Human responses are fast</td>
-<td>Human responses are slow or absent</td>
+<td>1 − (mean human RT / rt_max_s)</td>
+<td>High = low cognitive load (fast reaction → low load)</td>
+<td>Low = high cognitive load (slow reaction → high load)</td>
 </tr>
 <tr>
 <td>Trust / Quality Proxy</td>
@@ -814,8 +882,8 @@
 <td>Efficiency / Effort Loss</td>
 <td>EL</td>
 <td>(mean human <code>duration_s</code> − baseline) / baseline</td>
-<td>Human is slower than baseline</td>
-<td>Human matches or beats baseline</td>
+<td>Human is slower than baseline (EL &gt; 0; cannot be negative)</td>
+<td>Human at or faster than baseline (EL = 0)</td>
 </tr>
 <tr>
 <td>Efficiency Score</td>
@@ -826,6 +894,14 @@
 </tr>
 </tbody>
 </table>
+<div class="admonition warning">
+<p class="admonition-title">HCL direction is inverted</p>
+<p><strong>High HCL = low cognitive load = good.</strong><br />
+<strong>Low HCL = high cognitive load = bad.</strong><br />
+HCL=1.0 means the human reacted instantly (minimal load). HCL=0.0 means they
+took the maximum expected time (maximum load). See the
+<a href="../interpretation/#hcl--human-centeredness">Interpretation guide</a> for details.</p>
+</div>
 <h2 id="human-effort-responsiveness">Human Effort &amp; Responsiveness<a class="headerlink" href="#human-effort-responsiveness" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
@@ -1035,6 +1111,10 @@
 <a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="p">)</span>
 </code></pre></div>
 <p>Two modes are supported: <code>"relative"</code> (seconds from session start) and <code>"absolute"</code> (ISO 8601 UTC timestamps). The evaluation report always discloses the effective window used.</p>
+<hr />
+<h2 id="going-deeper">Going deeper<a class="headerlink" href="#going-deeper" title="Permanent link">&para;</a></h2>
+<p>For full derivations, intuition, quadrant diagnostics, and common error patterns, see
+the <strong><a href="../interpretation/">Metric Interpretation Guide</a></strong>.</p>
 
 
 
