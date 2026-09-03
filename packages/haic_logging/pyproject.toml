@@ -17,3 +17,7 @@ package-dir = { "" = "src" }
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[project.urls]
+Homepage = "https://github.com/gfragi/haic-libs"
+Documentation = "https://github.com/gfragi/haic-libs/tree/main/packages/haic_logging"
