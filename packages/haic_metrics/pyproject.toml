@@ -5,12 +5,19 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "haic-metrics"
 version = "0.2.1"
-description = "Core evaluation metrics for Human-AI Collaboration (HAIC)"
+description = "Metrics computation for Human–AI Collaboration evaluation"
 readme = "README.md"
 requires-python = ">=3.10"
 license = { text = "MIT" }
 authors = [
   { name = "George Fragiadakis" }
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Programming Language :: Python :: 3",
 ]
 
 dependencies = []
@@ -20,3 +27,7 @@ package-dir = { "" = "src" }
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[project.urls]
+Homepage = "https://github.com/gfragi/haic-libs"
+Documentation = "https://github.com/gfragi/haic-libs/tree/main/packages/haic_metrics"

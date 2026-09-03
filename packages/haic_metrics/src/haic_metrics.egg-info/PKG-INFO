@@ -1,9 +1,16 @@
 Metadata-Version: 2.4
 Name: haic-metrics
-Version: 0.2.0
-Summary: Core evaluation metrics for Human-AI Collaboration (HAIC)
+Version: 0.2.1
+Summary: Metrics computation for Human–AI Collaboration evaluation
 Author: George Fragiadakis
 License: MIT
+Project-URL: Homepage, https://github.com/gfragi/haic-libs
+Project-URL: Documentation, https://github.com/gfragi/haic-libs/tree/main/packages/haic_metrics
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Science/Research
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Topic :: Scientific/Engineering :: Artificial Intelligence
+Classifier: Programming Language :: Python :: 3
 Requires-Python: >=3.10
 Description-Content-Type: text/markdown
 
