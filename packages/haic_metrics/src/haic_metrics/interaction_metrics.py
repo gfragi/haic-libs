@@ -255,7 +255,7 @@ def compute_metrics(
     T: Optional[float] = None,
     baseline_s: Optional[float] = DEFAULT_BASELINE_S,
     rt_max: float = DEFAULT_RT_MAX,
-) -> Dict[str, float]:
+) -> Dict[str, Optional[float]]:
     """
     Returns dict with keys: F, D, HCL, Tr, A, S, EL, EfficiencyScore
     Assumes decisions are sorted by 't' ascending.
@@ -280,12 +280,12 @@ def compute_metrics(
     D = _mean(durs)
 
     # 3) HCL: prefer human agent rows; fallback to agent rows
-    human_rts = [
-        (float(e["duration_s"]) if e.get("duration_s") is not None
-         else float(e.get("latency_ms", 0.0)) / 1000.0)
-        for e in agent_rows
+    # Human rows without any timing (duration_s and latency_ms both None) are
+    # skipped; previously latency_ms=None raised TypeError here.
+    human_rts = _durations([
+        e for e in agent_rows
         if str(e.get("actor_type", "")).lower() == "human" or str(e.get("agent", "")).upper().startswith("H")
-    ]
+    ])
     latencies_s = [
         float(e.get("latency_ms", 0.0)) / 1000.0
         for e in agent_rows
@@ -320,7 +320,10 @@ def compute_metrics(
         Tr = _clip01(1.0 - errors / labeled)
         Tr_note = None
 
-    # 5) A: adaptability on agent rows; clamp to [-1, 1] via tanh
+    # 5) A: adaptability on agent rows; clamp to [-1, 1] via tanh.
+    # Returns None when either window has no labeled rows (no imputation).
+    A = None
+    A_note = None
     if N_agents > 0:
         k = max(1, int(0.2 * N_agents))
         early = agent_rows[:k]
@@ -329,23 +332,28 @@ def compute_metrics(
         def acc(arr):
             have = [e for e in arr if e.get("correct") is not None]
             if not have:
-                return 1.0  # neutral if unlabeled
+                return None
             return sum(1 for e in have if e.get("correct") is True) / len(have)
 
         acc_early = acc(early)
         acc_late = acc(late)
-        denom = max(1e-9, acc_early)
-        raw_A = (acc_late - acc_early) / denom
-        A = math.tanh(raw_A)  # bounded [-1, 1]
+        if acc_early is None or acc_late is None:
+            A_note = "no labeled decisions in early or late window; A not computable"
+        elif acc_early == 0.0:
+            A_note = "early-window acceptance is 0; relative change undefined; A not computable"
+        else:
+            A = math.tanh((acc_late - acc_early) / acc_early)  # bounded [-1, 1]
     else:
-        A = 0.0
+        A_note = "no agent decisions; A not computable"
 
-    # 6) S: surrogate similarity (use agent rows)
+    # 6) S: surrogate similarity (use agent rows).
+    # Returns None when neither probability vectors nor surrogate actions are logged.
+    S = None
+    S_note = None
     P_h = _aggregate_probs(agent_rows, "probs")
     P_s = _aggregate_probs(agent_rows, "surrogate_probs")
     if P_h and P_s:
-        D_kl = _kl_divergence(P_h, P_s)
-        S = math.exp(-D_kl)
+        S = _clip01(math.exp(-_kl_divergence(P_h, P_s)))
     else:
         matches, compared = 0, 0
         for e in agent_rows:
@@ -353,8 +361,10 @@ def compute_metrics(
                 compared += 1
                 if e.get("action") == e.get("surrogate_action"):
                     matches += 1
-        S = (matches / compared) if compared > 0 else 0.0
-    S = _clip01(S)
+        if compared > 0:
+            S = _clip01(matches / compared)
+        else:
+            S_note = "no surrogate probabilities or actions logged; S not computable"
 
     # 7) EL: effort/efficiency loss vs baseline (use agent-window time)
     if baseline_s is not None and baseline_s > 0 and total_time > 0:
@@ -362,36 +372,42 @@ def compute_metrics(
     else:
         EL = None
 
-    # Base efficiency from EL only; treat missing EL as neutral (0) for the composite
-    el_for_score = EL if EL is not None else 0.0
-    EfficiencyScore = 1.0 / (1.0 + el_for_score)
+    # EfficiencyScore is derived from EL; None when EL is None (no imputation).
+    if EL is None:
+        EfficiencyScore = None
+    else:
+        EfficiencyScore = 1.0 / (1.0 + EL)
 
-    # ---- Gentle shaping with off-role and progress signals (if present) ----
-    def _count_pred(rows: List[Dict[str, Any]], pred: Callable[[Dict[str, Any]], bool]) -> int:
-        return sum(1 for e in rows if pred(e))
+        # ---- Gentle shaping with off-role and progress signals (if present) ----
+        offrole_count = _count(agent_rows, lambda e: bool(e.get("off_role_action")))
+        offrole_rate = (offrole_count / N_agents) if N_agents > 0 else 0.0
 
-    offrole_count = _count_pred(agent_rows, lambda e: bool(e.get("off_role_action")))
-    offrole_rate = (offrole_count / N_agents) if N_agents > 0 else 0.0
+        progress_count = _count(decisions, lambda e: str(e.get("event_type", "")).lower() in {"checklist_progress", "progress"})
+        progress_rate = (progress_count / max(1.0, total_time)) if total_time > 0 else 0.0  # events/sec
 
-    progress_count = _count(decisions, lambda e: str(e.get("event_type", "")).lower() in {"checklist_progress", "progress"})
-    progress_rate = (progress_count / max(1.0, total_time)) if total_time > 0 else 0.0  # events/sec
+        EfficiencyScore *= (1.0 - _OFFROLE_PENALTY_WEIGHT * _clip01(offrole_rate))
+        EfficiencyScore *= (1.0 + _PROGRESS_BONUS_WEIGHT * _clip01(progress_rate))
+        EfficiencyScore = _clip01(EfficiencyScore)
 
-    EfficiencyScore *= (1.0 - _OFFROLE_PENALTY_WEIGHT * _clip01(offrole_rate))
-    EfficiencyScore *= (1.0 + _PROGRESS_BONUS_WEIGHT * _clip01(progress_rate))
-    EfficiencyScore = _clip01(EfficiencyScore)
+    def _f(x):
+        return None if x is None else float(x)
 
     out = {
         "F": float(F),
         "D": float(D),
         "HCL": float(HCL),
-        "Tr": None if Tr is None else float(Tr),
-        "A": float(A),
-        "S": float(S),
-        "EL": None if EL is None else float(EL),
-        "EfficiencyScore": float(EfficiencyScore),
+        "Tr": _f(Tr),
+        "A": _f(A),
+        "S": _f(S),
+        "EL": _f(EL),
+        "EfficiencyScore": _f(EfficiencyScore),
     }
     if Tr_note:
         out["Tr_note"] = Tr_note
+    if A_note:
+        out["A_note"] = A_note
+    if S_note:
+        out["S_note"] = S_note
     return out
 
 def compute_metrics_by_agent(decisions: List[Dict[str, Any]], **kw) -> Dict[str, Dict[str, float]]:

@@ -12,7 +12,7 @@
     | Mean Action Duration | D | mean(`duration_s`) across all decisions | Slow, effortful actions | Fast, fluent interactions |
     | Human-Centeredness | HCL | 1 − (mean human RT / rt_max_s) | High = low cognitive load (fast reaction → low load) | Low = high cognitive load (slow reaction → high load) |
     | Trust / Quality Proxy | Tr | mean(`correct`) where `correct` is present; `None` if no labels | High accuracy / acceptance rate | Frequent corrections or rejections |
-    | Efficiency / Effort Loss | EL | (mean human `duration_s` − baseline) / baseline | Human is slower than baseline (EL > 0; cannot be negative) | Human at or faster than baseline (EL = 0) |
+    | Efficiency / Effort Loss | EL | max(0, (session duration T − baseline) / baseline); `None` without an explicit baseline | Session slower than the no-AI baseline (EL > 0) | Session at or faster than baseline (EL = 0) |
     | Efficiency Score | — | composite of EL and penalty terms | Efficient, low-overhead session | High effort relative to outcome |
 
 
@@ -74,7 +74,7 @@
 
 ## EL baseline
 
-`EL` compares mean human `duration_s` against a baseline. When `baseline_s=None` (the default), the baseline is auto-derived as the **P95 of human `duration_s`** within the artifact. A warning is added to the report if fewer than 3 human observations are present.
+`EL` compares the session duration `T` against `baseline_s`, the expected duration of the same task without AI assistance. `baseline_s` must be supplied explicitly; when it is `None` (the default), `EL` and `EfficiencyScore` are `None` and a warning is added. Earlier versions (≤ 0.2.1) auto-derived the baseline as the P95 of human `duration_s`; that fallback was removed in 0.3.0 because a single-step percentile is not a counterfactual reference for a whole session.
 
 ## Windowed evaluation
 

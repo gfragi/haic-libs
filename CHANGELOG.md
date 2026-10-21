@@ -33,6 +33,36 @@ To cut a new release:
 
 ---
 
+## [v0.3.0] – unreleased
+
+### Changed (behaviour)
+
+- `A` returns `None` (not `0.0`) when the early or late window has no labeled
+  decisions, or when early-window acceptance is 0 (relative change undefined).
+  An `A_note` key explains the status.
+- `S` returns `None` (not `0.0`) when neither probability vectors
+  (`probs` / `surrogate_probs`) nor `surrogate_action` fields are logged.
+  An `S_note` key explains the status.
+- `EL` requires an explicit `baseline_s`. The P95-of-human-`duration_s` fallback
+  was removed: a single-step percentile is not a counterfactual reference for a
+  session, and the resulting ratio measured session length rather than overhead.
+- `EfficiencyScore` is `None` when `EL` is `None` (previously a missing EL was
+  treated as 0, giving a score of 1.0).
+
+### Fixed
+
+- `HCL` no longer raises `TypeError` for a human decision logged without timing
+  (`duration_s` and `latency_ms` both `None`, which `haic-logging` writes by
+  default); such decisions are skipped. Reported by a cross-domain study team.
+
+### Added
+
+- `tests/test_metrics_known_answer.py`: hand-computed fixtures checking the
+  values of F, D, HCL, Tr, A, S (agreement and KL), EL and EfficiencyScore,
+  and the `None` paths.
+
+---
+
 ## [v0.2.1] – 2026-04-13
 
 ### Fixed

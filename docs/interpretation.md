@@ -19,10 +19,10 @@ expected task duration without AI assistance (or with a previous, simpler system
 | How to set it | When to use |
 |---|---|
 | Measure directly (time users on the task pre-deployment) | You have a pre-AI baseline |
-| Let haic-metrics auto-derive as P95 of `duration_s` | You have ≥ 10 human observations and no external baseline |
+| Estimate from a documented reference activity (e.g., manual search time) | No measured baseline; state the estimate and its source |
 
-Always state which approach you used. The two methods can produce different EL values
-for the same data.
+Always state which approach you used. Without a baseline, EL is not computed
+(since 0.3.0 there is no automatic fallback).
 
 ### `rt_max_s` — the HCL ceiling
 

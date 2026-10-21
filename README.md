@@ -161,8 +161,12 @@ print(haic_metrics.report(artifact_path))
 
 Key `compute_metrics` behaviours:
 
-- **EL baseline**: auto-derived as P95 of human `duration_s` when `baseline_s=None`;
-  a warning is added if fewer than 3 observations are available.
+- **EL baseline**: EL and `EfficiencyScore` are computed only when an explicit
+  `baseline_s` (task duration without AI, in seconds) is passed; otherwise both are
+  `None` and a warning is added. No baseline is derived from the session itself.
+- **A / S**: return `None` (not `0.0`) when their inputs are absent (no labels in the
+  early/late windows for A; no surrogate probabilities or actions for S), with
+  `A_note` / `S_note` explaining why.
 - **Tr**: returns `None` (not `1.0`) when no decisions carry a `correct` label,
   making the metric's absence explicit. A `Tr_note` key explains the status.
 - **Windowing**: pass `window={"basis": "relative", "last": 120}` to restrict
