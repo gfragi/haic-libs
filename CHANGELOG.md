@@ -33,7 +33,7 @@ To cut a new release:
 
 ---
 
-## [v0.3.0] – unreleased
+## [v0.3.0] – 2026-11-02
 
 ### Changed (behaviour)
 
@@ -48,18 +48,51 @@ To cut a new release:
   session, and the resulting ratio measured session length rather than overhead.
 - `EfficiencyScore` is `None` when `EL` is `None` (previously a missing EL was
   treated as 0, giving a score of 1.0).
+- Extended outcome metrics (`profile="full"`) return `None` (not `0.0`) when their
+  required fields are absent or the metric is undefined: accuracy and agreement
+  without `prediction`/`ground_truth` labels, precision without positive
+  predictions, recall without positive ground truth, trust score without
+  `trust_rating`/`trust_scale_maximum`. A warning lists the metrics not computed.
+- `outcome_prediction_accuracy` is computed over labeled decisions only;
+  unlabeled decisions were previously counted as errors.
+- `__version__` falls back to `"unknown"` (not a hard-coded `"0.1.1"`) when the
+  package metadata is unavailable, e.g. when run from a source checkout.
 
 ### Fixed
 
 - `HCL` no longer raises `TypeError` for a human decision logged without timing
   (`duration_s` and `latency_ms` both `None`, which `haic-logging` writes by
   default); such decisions are skipped. Reported by a cross-domain study team.
+- Markdown report: `run_id` / `session_id` are read from the artifact's top level
+  and the model from `ai_system.model_name`, where `haic-logging` writes them
+  (previously shown as `n/a`).
+- Markdown report shows the `rt_max_s` actually used (previously always 60).
+- `reporting/` is now a regular package (`__init__.py` added), so it is always
+  included in built wheels.
 
 ### Added
 
 - `tests/test_metrics_known_answer.py`: hand-computed fixtures checking the
   values of F, D, HCL, Tr, A, S (agreement and KL), EL and EfficiencyScore,
   and the `None` paths.
+- `outcome_f1` (F1-score, 2PR / (P + R)) in the `full` profile.
+- `tests/test_outcome_known_answer.py`: known-answer and `None`-path tests for
+  every extended outcome metric.
+- `haic_metrics.report(..., rt_max_s=...)`, passed through to `compute_metrics`
+  (also on `compute_metrics_from_file`).
+- `haic_metrics.report(..., fmt="json")` and `render_json_report()`: a JSON report
+  with metrics, window summary, warnings, parameters, schema and library versions.
+- Markdown report states the decisions schema (`artifact_schema`, `schema_version`).
+- GitHub Actions workflow running `pytest` on Python 3.10–3.12, with README badge.
+
+### Removed (documentation)
+
+- Safety incident rate, abstention rate and error recovery time were removed from
+  the extended-metric documentation: they were documented but never implemented.
+
+### Versions
+
+- `haic-metrics` 0.3.0. `haic-logging` stays 0.1.0 (no code changes).
 
 ---
 
@@ -203,7 +236,8 @@ To cut a new release:
 ---
 
 
-[Unreleased]: https://github.com/gfragi/haic-libs.git/compare/v0.2.1...HEAD
+[Unreleased]: https://github.com/gfragi/haic-libs/compare/v0.3.0...HEAD
+[v0.3.0]: https://github.com/gfragi/haic-libs/compare/v0.2.1...v0.3.0
 [v0.2.1]: https://github.com/gfragi/haic-libs.git/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/gfragi/haic-libs.git/compare/v0.1.2...v0.2.0
 [0.1.2]: https://github.com/gfragi/haic-libs.git/compare/v0.1.0...v0.1.2
