@@ -1,5 +1,7 @@
 # HAIC Libraries
 
+[![tests](https://github.com/gfragi/haic-libs/actions/workflows/tests.yml/badge.svg)](https://github.com/gfragi/haic-libs/actions/workflows/tests.yml)
+
 This repository contains the core, reusable libraries that underpin
 the HAIC (Human–AI Collaboration) benchmarking and evaluation framework.
 

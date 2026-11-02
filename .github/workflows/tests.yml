@@ -1,0 +1,20 @@
+name: tests
+on:
+  push:
+    branches: [main, "release/**"]
+  pull_request:
+
+jobs:
+  pytest:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.11", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - run: pip install pytest -e packages/haic_logging -e packages/haic_metrics
+      - run: pytest -v tests packages/haic_logging/src/haic_logging/tests
