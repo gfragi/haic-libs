@@ -1,0 +1,50 @@
+cff-version: 1.2.0
+message: >-
+  If you use haic-libs in your research, please cite it using the metadata
+  below, and cite the HAIC evaluation framework it implements (see references).
+type: software
+title: "haic-libs: Logging and Metrics for Human–AI Collaboration Evaluation"
+abstract: >-
+  haic-libs is an open-source Python library for evaluating Human–AI
+  Collaboration (HAIC) from interaction logs. It consists of two packages:
+  haic-logging, which records human and AI decisions into a versioned
+  decisions artifact, and haic-metrics, which computes HAIC metrics
+  (interaction frequency, action duration, human-centeredness, trust,
+  adaptability, effort loss, efficiency, similarity) offline over explicit
+  temporal windows and renders Markdown and JSON reports.
+authors:
+  - given-names: George
+    family-names: Fragiadakis
+    affiliation: >-
+      Department of Informatics and Telematics, Harokopio University of Athens
+version: 0.3.0
+date-released: "2026-11-02"
+commit: 13f0a17d17995013aa30dfdd581c6ea68d4073dc
+license: MIT
+repository-code: "https://github.com/gfragi/haic-libs"
+url: "https://gfragi.github.io/haic-libs"
+keywords:
+  - human-AI collaboration
+  - evaluation
+  - metrics
+  - interaction logging
+  - reproducibility
+  - Python
+references:
+  - type: article
+    title: "Evaluating Human-AI Collaboration: A Review and Methodological Framework"
+    authors:
+      - given-names: George
+        family-names: Fragiadakis
+      - given-names: Christos
+        family-names: Diou
+      - given-names: George
+        family-names: Kousiouris
+      - given-names: Mara
+        family-names: Nikolaidou
+    year: 2025
+    url: "https://arxiv.org/abs/2407.19098"
+    identifiers:
+      - type: other
+        value: "arXiv:2407.19098"
+        description: arXiv identifier
