@@ -1,5 +1,5 @@
 
-from typing import Dict, List, Any
+from typing import Dict, List, Any, Optional
 
 
 
@@ -175,6 +175,12 @@ class Metrics:
         return c or {"tp":0,"fp":0,"tn":0,"fn":0}
 
     @classmethod
+    def _labeled_confusions(cls, interaction_data):
+        """One-hot confusions for decisions whose outcome can be derived; unlabeled decisions are skipped."""
+        confs = [cls._derive_confusion(it) for it in interaction_data]
+        return [c for c in confs if sum(c.values()) > 0]
+
+    @classmethod
     def _bool_correct(cls, item):
         # Prefer explicit boolean
         b = cls._get(item, "outcome_bool")
@@ -193,30 +199,35 @@ class Metrics:
     class Effectiveness:
         @staticmethod
         def calculate_prediction_accuracy(interaction_data):
-            # accuracy = (TP + TN) / N
-            tp = tn = 0
-            n = 0
-            for it in interaction_data:
-                conf = Metrics._derive_confusion(it)
-                tp += conf.get("tp", 0); tn += conf.get("tn", 0)
-                n += sum(conf.values()) or 1  # assume 1 when not explicit
-            return (tp + tn) / n if n > 0 else 0.0
+            # accuracy = (TP + TN) / N over labeled decisions; None when none are labeled
+            confs = Metrics._labeled_confusions(interaction_data)
+            if not confs:
+                return None
+            tp = sum(c["tp"] for c in confs); tn = sum(c["tn"] for c in confs)
+            return (tp + tn) / len(confs)
 
         @staticmethod
         def calculate_precision(interaction_data):
-            tp = fp = 0
-            for it in interaction_data:
-                conf = Metrics._derive_confusion(it)
-                tp += conf.get("tp", 0); fp += conf.get("fp", 0)
-            return tp / (tp + fp) if (tp + fp) > 0 else 0.0
+            # None when no labels, or no positive predictions (TP + FP = 0, undefined)
+            confs = Metrics._labeled_confusions(interaction_data)
+            tp = sum(c["tp"] for c in confs); fp = sum(c["fp"] for c in confs)
+            return tp / (tp + fp) if (tp + fp) > 0 else None
 
         @staticmethod
         def calculate_recall(interaction_data):
-            tp = fn = 0
-            for it in interaction_data:
-                conf = Metrics._derive_confusion(it)
-                tp += conf.get("tp", 0); fn += conf.get("fn", 0)
-            return tp / (tp + fn) if (tp + fn) > 0 else 0.0
+            # None when no labels, or no positive ground truth (TP + FN = 0, undefined)
+            confs = Metrics._labeled_confusions(interaction_data)
+            tp = sum(c["tp"] for c in confs); fn = sum(c["fn"] for c in confs)
+            return tp / (tp + fn) if (tp + fn) > 0 else None
+
+        @staticmethod
+        def calculate_f1(interaction_data):
+            # F1 = 2PR / (P + R); None when precision or recall is undefined
+            p = Metrics.Effectiveness.calculate_precision(interaction_data)
+            r = Metrics.Effectiveness.calculate_recall(interaction_data)
+            if p is None or r is None:
+                return None
+            return 2 * p * r / (p + r) if (p + r) > 0 else 0.0
 
         @staticmethod
         def calculate_overall_system_accuracy(interaction_data):
@@ -329,7 +340,7 @@ class Metrics:
                     continue
                 total += 1
                 agree += 1 if str(h).strip().lower() == str(a).strip().lower() else 0
-            return agree / total if total > 0 else 0.0
+            return agree / total if total > 0 else None
 
         @staticmethod
         def calculate_ai_assistance_rate(interaction_data):
@@ -366,7 +377,7 @@ class Metrics:
         def calculate_trust_score(interaction_data):
             ratings = sum(Metrics._to_float(Metrics._get(it, "trust_rating"), 0.0) for it in interaction_data)
             scale   = sum(Metrics._to_float(Metrics._get(it, "trust_scale_maximum"), 0.0) for it in interaction_data)
-            return (ratings / scale) * 100.0 if scale > 0 else 0.0
+            return (ratings / scale) * 100.0 if scale > 0 else None
 
         @staticmethod
         def calculate_safety_incidents(interaction_data):
@@ -399,6 +410,7 @@ class Metrics:
                 "Prediction Accuracy",
                 "Precision",
                 "Recall",
+                "F1-Score",
                 "Overall System Accuracy",
                 "Model Improvement Rate",
             ],
@@ -439,22 +451,28 @@ class Metrics:
         }
 
 
+def _opt_float(x) -> Optional[float]:
+    return None if x is None else float(x)
+
+
 def compute_outcome_metrics(
     decisions: List[Dict[str, Any]],
     *,
     profile: str = "core_outcomes",
-) -> Dict[str, float]:
+) -> Dict[str, Optional[float]]:
     """
     Outcome/quality catalogue (opt-in).
     'core_outcomes' focuses on generic, commonly-available outcome measures.
+    A metric is None (not 0.0) when its required fields are absent or it is undefined.
     """
     if profile != "core_outcomes":
         raise ValueError(f"Unknown profile: {profile}")
 
     return {
-        "outcome_prediction_accuracy": float(Metrics.Effectiveness.calculate_prediction_accuracy(decisions)),
-        "outcome_precision": float(Metrics.Effectiveness.calculate_precision(decisions)),
-        "outcome_recall": float(Metrics.Effectiveness.calculate_recall(decisions)),
-        "outcome_human_ai_agreement_rate": float(Metrics.CollaborationAndInteraction.calculate_human_ai_agreement_rate(decisions)),
-        "outcome_trust_score": float(Metrics.TrustAndSafety.calculate_trust_score(decisions)),
+        "outcome_prediction_accuracy": _opt_float(Metrics.Effectiveness.calculate_prediction_accuracy(decisions)),
+        "outcome_precision": _opt_float(Metrics.Effectiveness.calculate_precision(decisions)),
+        "outcome_recall": _opt_float(Metrics.Effectiveness.calculate_recall(decisions)),
+        "outcome_f1": _opt_float(Metrics.Effectiveness.calculate_f1(decisions)),
+        "outcome_human_ai_agreement_rate": _opt_float(Metrics.CollaborationAndInteraction.calculate_human_ai_agreement_rate(decisions)),
+        "outcome_trust_score": _opt_float(Metrics.TrustAndSafety.calculate_trust_score(decisions)),
     }

@@ -96,7 +96,14 @@ def compute_metrics(
 
     # Extended catalogue
     if profile == "full":
-        metrics.update(compute_outcome_metrics(decisions_f, profile="core_outcomes"))
+        outcome = compute_outcome_metrics(decisions_f, profile="core_outcomes")
+        missing = [k for k, v in outcome.items() if v is None]
+        if missing:
+            warnings.append(
+                "Outcome metrics not computed (required fields absent or metric undefined): "
+                + ", ".join(missing)
+            )
+        metrics.update(outcome)
     elif profile != "core":
         raise ValueError(f"Unknown profile: {profile}")
 
