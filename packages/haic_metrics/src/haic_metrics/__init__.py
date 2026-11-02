@@ -13,7 +13,9 @@ try:
     from importlib.metadata import version as _v
     __version__ = _v("haic-metrics")
 except Exception:
-    __version__ = "0.1.1"
+    # Not installed (e.g. run from a source checkout): report that honestly
+    # rather than a hard-coded release number that drifts out of date.
+    __version__ = "unknown"
 
 
 def report(

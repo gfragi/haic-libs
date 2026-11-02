@@ -130,6 +130,20 @@ def test_report_rejects_unknown_fmt(tmp_path):
         haic_metrics.report(_write_artifact(tmp_path), fmt="html")
 
 
+def test_version_fallback_when_not_installed(monkeypatch):
+    import importlib
+    import importlib.metadata
+
+    def _missing(name):
+        raise importlib.metadata.PackageNotFoundError(name)
+
+    monkeypatch.setattr(importlib.metadata, "version", _missing)
+    try:
+        assert importlib.reload(haic_metrics).__version__ == "unknown"
+    finally:
+        monkeypatch.undo()
+        importlib.reload(haic_metrics)
+    assert haic_metrics.__version__ not in ("unknown", "0.1.1")
 
 
 def test_markdown_report_has_no_unrendered_template_markup(tmp_path):
