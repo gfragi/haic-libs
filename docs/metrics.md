@@ -12,7 +12,7 @@
     | Mean Action Duration | D | mean(`duration_s`) across all decisions | Slow, effortful actions | Fast, fluent interactions |
     | Human-Centeredness | HCL | 1 − (mean human RT / rt_max_s) | High = low cognitive load (fast reaction → low load) | Low = high cognitive load (slow reaction → high load) |
     | Trust / Quality Proxy | Tr | mean(`correct`) where `correct` is present; `None` if no labels | High accuracy / acceptance rate | Frequent corrections or rejections |
-    | Efficiency / Effort Loss | EL | (mean human `duration_s` − baseline) / baseline | Human is slower than baseline (EL > 0; cannot be negative) | Human at or faster than baseline (EL = 0) |
+    | Efficiency / Effort Loss | EL | max(0, (session duration T − baseline) / baseline); `None` without an explicit baseline | Session slower than the no-AI baseline (EL > 0) | Session at or faster than baseline (EL = 0) |
     | Efficiency Score | — | composite of EL and penalty terms | Efficient, low-overhead session | High effort relative to outcome |
 
 
@@ -48,33 +48,32 @@
 
 === "Extended profile (full)"
 
-    All core metrics plus the following, computed when sufficient labels are present:
+    All core metrics plus the following, computed when the required fields are present:
 
     ## Outcome & Quality
 
     | Metric | Symbol | Formula | High value | Low value |
     |---|---|---|---|---|
-    | Prediction Accuracy | — | correct predictions / total | Model is accurate | Model makes many errors |
+    | Prediction Accuracy | — | (TP + TN) / labeled decisions | Model is accurate | Model makes many errors |
     | Precision | — | TP / (TP + FP) | Few false positives | Many false positives |
     | Recall | — | TP / (TP + FN) | Few missed positives | Many missed positives |
     | F1-Score | — | 2 · Precision · Recall / (Precision + Recall) | Strong precision–recall balance | Imbalanced or poor overall quality |
     | Human–AI Agreement Rate | — | proportion of matching decisions | High alignment between human and AI | Frequent disagreement |
 
-    ## Trust, Safety & Robustness
+    ## Trust
 
     | Metric | Symbol | Description | High value | Low value |
     |---|---|---|---|---|
-    | Trust Score | — | composite of agreement rate and error rate | System is trusted and accurate | Frequent errors erode trust |
-    | Safety Incident Rate | — | frequency of decisions flagged as unsafe | Many safety events (bad) | No safety incidents (good) |
-    | Abstention Rate | — | proportion of `action=abstain` AI decisions | AI withholds often (cautious/uncertain) | AI always provides an answer |
-    | Error Recovery Time | — | mean time from error to correction | Slow recovery | Fast recovery |
+    | Trust Score | — | 100 · Σ `trust_rating` / Σ `trust_scale_maximum` (self-reported ratings) | Users report high trust | Users report low trust |
+
+    Required fields: `prediction` and `ground_truth` (or a `result` label such as `true_positive`) for accuracy, precision, recall, F1 and agreement; `trust_rating` and `trust_scale_maximum` for the trust score.
 
     !!! note
-        Extended metrics require domain-specific logging. `profile="full"` silently skips metrics whose required fields are absent.
+        Extended metrics require domain-specific logging. Since 0.3.0, a metric whose required fields are absent, or that is undefined (e.g. precision with no positive predictions), is `None` rather than `0.0`, and a warning names it. Decisions without labels are excluded from accuracy rather than counted as errors.
 
 ## EL baseline
 
-`EL` compares mean human `duration_s` against a baseline. When `baseline_s=None` (the default), the baseline is auto-derived as the **P95 of human `duration_s`** within the artifact. A warning is added to the report if fewer than 3 human observations are present.
+`EL` compares the session duration `T` against `baseline_s`, the expected duration of the same task without AI assistance. `baseline_s` must be supplied explicitly; when it is `None` (the default), `EL` and `EfficiencyScore` are `None` and a warning is added. Earlier versions (≤ 0.2.1) auto-derived the baseline as the P95 of human `duration_s`; that fallback was removed in 0.3.0 because a single-step percentile is not a counterfactual reference for a whole session.
 
 ## Windowed evaluation
 

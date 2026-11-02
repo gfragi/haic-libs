@@ -25,7 +25,9 @@ def test_compute_metrics_respects_window():
 
     assert metrics["F"] >= 0.0
     assert 0.0 <= metrics["HCL"] <= 1.0
-    assert 0.0 <= metrics["EfficiencyScore"] <= 1.0
+    # no task baseline given -> EL and EfficiencyScore are not computed
+    assert metrics["EL"] is None
+    assert metrics["EfficiencyScore"] is None
 
 
 from haic_metrics import compute_metrics

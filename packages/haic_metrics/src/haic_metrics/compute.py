@@ -1,5 +1,4 @@
 from __future__ import annotations
-import statistics
 from typing import Any, Dict, List, Union, Optional, Literal, TypedDict
 
 from .io import extract_decisions
@@ -54,12 +53,11 @@ def compute_metrics(
       - window={"basis":"absolute","start":<iso>,"end":<iso>}     -> ISO timestamps
 
     baseline_s:
-      If None (default), auto-derived as the P95 of human decision duration_s values
-      within the evaluation window (decisions where actor_type="human" and duration_s
-      is not None), but only when at least 10 such observations are available.
-      If fewer than 10 exist, EL is set to None and a warning is added:
-      "EL baseline not reliable: fewer than 10 human duration observations in
-      session (n=X)." Pass an explicit baseline_s to override this guard.
+      Reference duration (seconds) of the task performed without AI assistance.
+      EL and EfficiencyScore are computed only when an explicit baseline_s is given;
+      if None (default), both are None and a warning is added. The baseline is not
+      derived from the session itself (a session-internal statistic is not a
+      counterfactual reference for the task).
     """
     decisions = extract_decisions(decisions_or_artifact)
 
@@ -76,21 +74,10 @@ def compute_metrics(
     )
     # events_f currently not used by metric calculators; kept for reporting/diagnostics.
 
-    # Auto-derive baseline_s as P95 of human duration_s if not explicitly provided.
     if baseline_s is None:
-        human_durs = [
-            float(d["duration_s"])
-            for d in decisions_f
-            if d.get("actor_type") == "human" and d.get("duration_s") is not None
-        ]
-        if len(human_durs) >= 10:
-            baseline_s = statistics.quantiles(human_durs, n=100)[94]  # index 94 = P95
-        else:
-            warnings.append(
-                f"EL baseline not reliable: fewer than 10 human duration observations "
-                f"in session (n={len(human_durs)})."
-            )
-            # baseline_s stays None → EL will be None
+        warnings.append(
+            "EL not computed: no task baseline provided (pass baseline_s, in seconds)."
+        )
 
     metrics: JsonDict = {}
 
@@ -109,13 +96,21 @@ def compute_metrics(
 
     # Extended catalogue
     if profile == "full":
-        metrics.update(compute_outcome_metrics(decisions_f, profile="core_outcomes"))
+        outcome = compute_outcome_metrics(decisions_f, profile="core_outcomes")
+        missing = [k for k, v in outcome.items() if v is None]
+        if missing:
+            warnings.append(
+                "Outcome metrics not computed (required fields absent or metric undefined): "
+                + ", ".join(missing)
+            )
+        metrics.update(outcome)
     elif profile != "core":
         raise ValueError(f"Unknown profile: {profile}")
 
     out: JsonDict = {
         "metrics": metrics,
         "window_summary": window_summary,
+        "rt_max_s": rt_max_s,
     }
 
     if include_warnings:

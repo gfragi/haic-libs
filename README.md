@@ -1,5 +1,7 @@
 # HAIC Libraries
 
+[![tests](https://github.com/gfragi/haic-libs/actions/workflows/tests.yml/badge.svg)](https://github.com/gfragi/haic-libs/actions/workflows/tests.yml)
+
 This repository contains the core, reusable libraries that underpin
 the HAIC (Human–AI Collaboration) benchmarking and evaluation framework.
 
@@ -95,7 +97,9 @@ print(haic_metrics.report("haic_decisions_xxx.json"))
 ```
 
 `report()` loads the artifact, computes all core KPIs, and returns a
-ready-to-print Markdown evaluation report.
+ready-to-print Markdown evaluation report. Pass `fmt="json"` for a
+machine-readable report, and `rt_max_s=` to change the HCL normalisation
+(default 60 s).
 
 ---
 
@@ -154,15 +158,19 @@ print(haic_metrics.report(artifact_path))
 
 | Function | Description |
 | --- | --- |
-| `haic_metrics.report(path, *, profile, **kw)` | Full pipeline: load → compute → render Markdown report |
-| `haic_metrics.compute_metrics(artifact, *, profile, baseline_s, window)` | Compute KPIs from a loaded artifact dict or decisions list |
-| `haic_metrics.compute_metrics_from_file(path, *, profile, baseline_s, window)` | Load artifact from file and compute KPIs |
+| `haic_metrics.report(path, *, profile, rt_max_s, baseline_s, window, fmt)` | Full pipeline: load → compute → render a Markdown (`fmt="md"`) or JSON (`fmt="json"`) report |
+| `haic_metrics.compute_metrics(artifact, *, profile, rt_max_s, baseline_s, window)` | Compute KPIs from a loaded artifact dict or decisions list |
+| `haic_metrics.compute_metrics_from_file(path, *, profile, rt_max_s, baseline_s, window)` | Load artifact from file and compute KPIs |
 | `haic_metrics.render_markdown_report(*, result, artifact, ...)` | Render a Markdown report from a pre-computed result dict |
 
 Key `compute_metrics` behaviours:
 
-- **EL baseline**: auto-derived as P95 of human `duration_s` when `baseline_s=None`;
-  a warning is added if fewer than 3 observations are available.
+- **EL baseline**: EL and `EfficiencyScore` are computed only when an explicit
+  `baseline_s` (task duration without AI, in seconds) is passed; otherwise both are
+  `None` and a warning is added. No baseline is derived from the session itself.
+- **A / S**: return `None` (not `0.0`) when their inputs are absent (no labels in the
+  early/late windows for A; no surrogate probabilities or actions for S), with
+  `A_note` / `S_note` explaining why.
 - **Tr**: returns `None` (not `1.0`) when no decisions carry a `correct` label,
   making the metric's absence explicit. A `Tr_note` key explains the status.
 - **Windowing**: pass `window={"basis": "relative", "last": 120}` to restrict

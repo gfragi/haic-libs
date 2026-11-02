@@ -129,11 +129,12 @@ Includes:
 
 ### profile="full"
 
-Includes all core metrics plus outcome-based measures when sufficient labels are present:
-- `accuracy`
-- `precision` / `recall`
-- `human–AI agreement`
-- `trust score proxies`
+Includes all core metrics plus outcome-based measures when the required fields are present
+(each is `None`, not `0.0`, otherwise):
+- `outcome_prediction_accuracy`
+- `outcome_precision` / `outcome_recall` / `outcome_f1`
+- `outcome_human_ai_agreement_rate`
+- `outcome_trust_score` (from `trust_rating` / `trust_scale_maximum`)
 
 ## Output Format
 

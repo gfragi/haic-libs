@@ -53,6 +53,7 @@ REPORT_MD_TEMPLATE = """# HAIC Evaluation Report
 
 ## Reproducibility
 - **artifact:** {{ artifact_path }}
+- **decisions schema:** {{ artifact_schema }} (schema_version: {{ schema_version }})
 - **library versions:** haic-metrics {{ version_metrics }}, haic-logging {{ version_logging }}
 - **generated at:** {{ generated_at }}
 """
