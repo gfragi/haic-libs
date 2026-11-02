@@ -23,7 +23,7 @@
       
       
       <link rel="icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.8.0">
     
     
       
@@ -31,10 +31,10 @@
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.ec1eaa64.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.57a0d79d.min.css">
       
         
-        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+        <link rel="stylesheet" href="../assets/stylesheets/palette.fb2fffe2.min.css">
       
       
 
@@ -556,10 +556,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#trust-safety-robustness" class="md-nav__link">
+  <a href="#trust" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Trust, Safety &amp; Robustness
+        Trust
       
     </span>
   </a>
@@ -770,10 +770,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#trust-safety-robustness" class="md-nav__link">
+  <a href="#trust" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Trust, Safety &amp; Robustness
+        Trust
       
     </span>
   </a>
@@ -881,9 +881,9 @@
 <tr>
 <td>Efficiency / Effort Loss</td>
 <td>EL</td>
-<td>(mean human <code>duration_s</code> − baseline) / baseline</td>
-<td>Human is slower than baseline (EL &gt; 0; cannot be negative)</td>
-<td>Human at or faster than baseline (EL = 0)</td>
+<td>max(0, (session duration T − baseline) / baseline); <code>None</code> without an explicit baseline</td>
+<td>Session slower than the no-AI baseline (EL &gt; 0)</td>
+<td>Session at or faster than baseline (EL = 0)</td>
 </tr>
 <tr>
 <td>Efficiency Score</td>
@@ -1002,7 +1002,7 @@ took the maximum expected time (maximum load). See the
 </table>
 </div>
 <div class="tabbed-block">
-<p>All core metrics plus the following, computed when sufficient labels are present:</p>
+<p>All core metrics plus the following, computed when the required fields are present:</p>
 <h2 id="outcome-quality">Outcome &amp; Quality<a class="headerlink" href="#outcome-quality" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
@@ -1018,7 +1018,7 @@ took the maximum expected time (maximum load). See the
 <tr>
 <td>Prediction Accuracy</td>
 <td>—</td>
-<td>correct predictions / total</td>
+<td>(TP + TN) / labeled decisions</td>
 <td>Model is accurate</td>
 <td>Model makes many errors</td>
 </tr>
@@ -1052,7 +1052,7 @@ took the maximum expected time (maximum load). See the
 </tr>
 </tbody>
 </table>
-<h2 id="trust-safety-robustness">Trust, Safety &amp; Robustness<a class="headerlink" href="#trust-safety-robustness" title="Permanent link">&para;</a></h2>
+<h2 id="trust">Trust<a class="headerlink" href="#trust" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
 <tr>
@@ -1067,42 +1067,22 @@ took the maximum expected time (maximum load). See the
 <tr>
 <td>Trust Score</td>
 <td>—</td>
-<td>composite of agreement rate and error rate</td>
-<td>System is trusted and accurate</td>
-<td>Frequent errors erode trust</td>
-</tr>
-<tr>
-<td>Safety Incident Rate</td>
-<td>—</td>
-<td>frequency of decisions flagged as unsafe</td>
-<td>Many safety events (bad)</td>
-<td>No safety incidents (good)</td>
-</tr>
-<tr>
-<td>Abstention Rate</td>
-<td>—</td>
-<td>proportion of <code>action=abstain</code> AI decisions</td>
-<td>AI withholds often (cautious/uncertain)</td>
-<td>AI always provides an answer</td>
-</tr>
-<tr>
-<td>Error Recovery Time</td>
-<td>—</td>
-<td>mean time from error to correction</td>
-<td>Slow recovery</td>
-<td>Fast recovery</td>
+<td>100 · Σ <code>trust_rating</code> / Σ <code>trust_scale_maximum</code> (self-reported ratings)</td>
+<td>Users report high trust</td>
+<td>Users report low trust</td>
 </tr>
 </tbody>
 </table>
+<p>Required fields: <code>prediction</code> and <code>ground_truth</code> (or a <code>result</code> label such as <code>true_positive</code>) for accuracy, precision, recall, F1 and agreement; <code>trust_rating</code> and <code>trust_scale_maximum</code> for the trust score.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>Extended metrics require domain-specific logging. <code>profile="full"</code> silently skips metrics whose required fields are absent.</p>
+<p>Extended metrics require domain-specific logging. Since 0.3.0, a metric whose required fields are absent, or that is undefined (e.g. precision with no positive predictions), is <code>None</code> rather than <code>0.0</code>, and a warning names it. Decisions without labels are excluded from accuracy rather than counted as errors.</p>
 </div>
 </div>
 </div>
 </div>
 <h2 id="el-baseline">EL baseline<a class="headerlink" href="#el-baseline" title="Permanent link">&para;</a></h2>
-<p><code>EL</code> compares mean human <code>duration_s</code> against a baseline. When <code>baseline_s=None</code> (the default), the baseline is auto-derived as the <strong>P95 of human <code>duration_s</code></strong> within the artifact. A warning is added to the report if fewer than 3 human observations are present.</p>
+<p><code>EL</code> compares the session duration <code>T</code> against <code>baseline_s</code>, the expected duration of the same task without AI assistance. <code>baseline_s</code> must be supplied explicitly; when it is <code>None</code> (the default), <code>EL</code> and <code>EfficiencyScore</code> are <code>None</code> and a warning is added. Earlier versions (≤ 0.2.1) auto-derived the baseline as the P95 of human <code>duration_s</code>; that fallback was removed in 0.3.0 because a single-step percentile is not a counterfactual reference for a whole session.</p>
 <h2 id="windowed-evaluation">Windowed evaluation<a class="headerlink" href="#windowed-evaluation" title="Permanent link">&para;</a></h2>
 <p>All metrics can be computed over a temporal sub-window of a session:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">result</span> <span class="o">=</span> <span class="n">compute_metrics</span><span class="p">(</span>
@@ -1174,10 +1154,10 @@ the <strong><a href="../interpretation/">Metric Interpretation Guide</a></strong
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.tabs", "navigation.sections", "navigation.top", "content.code.copy", "content.code.annotate"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.tabs", "navigation.sections", "navigation.top", "content.code.copy", "content.code.annotate"], "search": "../assets/javascripts/workers/search.a7633da7.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
-      <script src="../assets/javascripts/bundle.d7400e89.min.js"></script>
+      <script src="../assets/javascripts/bundle.c21346df.min.js"></script>
       
     
   </body>
