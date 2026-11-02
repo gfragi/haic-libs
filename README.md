@@ -1,6 +1,8 @@
 # HAIC Libraries
 
 [![tests](https://github.com/gfragi/haic-libs/actions/workflows/tests.yml/badge.svg)](https://github.com/gfragi/haic-libs/actions/workflows/tests.yml)
+[![PyPI](https://img.shields.io/pypi/v/haic-metrics?label=haic-metrics)](https://pypi.org/project/haic-metrics/)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21197960.svg)](https://doi.org/10.5281/zenodo.21197960)
 
 This repository contains the core, reusable libraries that underpin
 the HAIC (Human–AI Collaboration) benchmarking and evaluation framework.
@@ -192,6 +194,11 @@ MIT
 ---
 
 ## Citation
+
+To cite the software, use the "Cite this repository" button on GitHub
+(from [`CITATION.cff`](CITATION.cff)) or the Zenodo archive:
+[10.5281/zenodo.21197960](https://doi.org/10.5281/zenodo.21197960) (all versions;
+v0.3.0 is [10.5281/zenodo.23896317](https://doi.org/10.5281/zenodo.23896317)).
 
 This library is built on the framework described in:
 

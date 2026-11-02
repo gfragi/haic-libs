@@ -18,6 +18,14 @@ authors:
     affiliation: >-
       Department of Informatics and Telematics, Harokopio University of Athens
 version: 0.3.0
+doi: 10.5281/zenodo.21197960
+identifiers:
+  - type: doi
+    value: 10.5281/zenodo.21197960
+    description: Concept DOI (all versions; resolves to the latest release)
+  - type: doi
+    value: 10.5281/zenodo.23896317
+    description: Version DOI for v0.3.0
 date-released: "2026-11-02"
 commit: 13f0a17d17995013aa30dfdd581c6ea68d4073dc
 license: MIT
