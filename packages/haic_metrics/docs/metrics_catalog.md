@@ -58,23 +58,20 @@ Notes:
 
 | Metric              | Symbol | Description                       | Required Fields              | Profile |
 | ------------------- | ------ | --------------------------------- | ---------------------------- | ------- |
-| Prediction Accuracy | —      | Correct predictions over total    | `prediction`, `ground_truth` | full    |
+| Prediction Accuracy | —      | Correct predictions over labeled decisions | `prediction`, `ground_truth` | full    |
 | Precision           | —      | Positive predictive value         | confusion matrix             | full    |
 | Recall              | —      | Sensitivity                       | confusion matrix             | full    |
 | F1-Score            | —      | Harmonic mean of precision/recall | confusion matrix             | full    |
+| Human–AI Agreement Rate | —  | Share of matching labels          | `prediction`, `ground_truth` | full    |
 
 Notes:
-- These are optional and only computed when explicit labels exist.
+- These are optional and only computed when explicit labels exist; otherwise they are `None`.
 - They are not considered core HAIC metrics.
 
-## 6. Trust, Safety & Robustness (Extended)
-| Metric               | Symbol | Description                | Required Fields    | Profile |
-| -------------------- | ------ | -------------------------- | ------------------ | ------- |
-| Trust Score          | —      | Composite trust proxy      | agreement + errors | full    |
-| Safety Incident Rate | —      | Frequency of unsafe events | safety flags       | full    |
-| Abstention Rate      | —      | Rate of AI abstentions     | `action=abstain`   | full    |
-| Error Recovery Time  | —      | Time to recover from error | timestamps         | full    |
+## 6. Trust (Extended)
+| Metric               | Symbol | Description                              | Required Fields                          | Profile |
+| -------------------- | ------ | ---------------------------------------- | ---------------------------------------- | ------- |
+| Trust Score          | —      | Self-reported trust, % of scale maximum  | `trust_rating`, `trust_scale_maximum`    | full    |
 
 Notes:
-- Intended for regulated or safety-critical domains.
-- Strongly dependent on domain-specific logging.
+- Strongly dependent on domain-specific logging; `None` when no ratings are logged.

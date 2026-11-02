@@ -48,29 +48,28 @@
 
 === "Extended profile (full)"
 
-    All core metrics plus the following, computed when sufficient labels are present:
+    All core metrics plus the following, computed when the required fields are present:
 
     ## Outcome & Quality
 
     | Metric | Symbol | Formula | High value | Low value |
     |---|---|---|---|---|
-    | Prediction Accuracy | — | correct predictions / total | Model is accurate | Model makes many errors |
+    | Prediction Accuracy | — | (TP + TN) / labeled decisions | Model is accurate | Model makes many errors |
     | Precision | — | TP / (TP + FP) | Few false positives | Many false positives |
     | Recall | — | TP / (TP + FN) | Few missed positives | Many missed positives |
     | F1-Score | — | 2 · Precision · Recall / (Precision + Recall) | Strong precision–recall balance | Imbalanced or poor overall quality |
     | Human–AI Agreement Rate | — | proportion of matching decisions | High alignment between human and AI | Frequent disagreement |
 
-    ## Trust, Safety & Robustness
+    ## Trust
 
     | Metric | Symbol | Description | High value | Low value |
     |---|---|---|---|---|
-    | Trust Score | — | composite of agreement rate and error rate | System is trusted and accurate | Frequent errors erode trust |
-    | Safety Incident Rate | — | frequency of decisions flagged as unsafe | Many safety events (bad) | No safety incidents (good) |
-    | Abstention Rate | — | proportion of `action=abstain` AI decisions | AI withholds often (cautious/uncertain) | AI always provides an answer |
-    | Error Recovery Time | — | mean time from error to correction | Slow recovery | Fast recovery |
+    | Trust Score | — | 100 · Σ `trust_rating` / Σ `trust_scale_maximum` (self-reported ratings) | Users report high trust | Users report low trust |
+
+    Required fields: `prediction` and `ground_truth` (or a `result` label such as `true_positive`) for accuracy, precision, recall, F1 and agreement; `trust_rating` and `trust_scale_maximum` for the trust score.
 
     !!! note
-        Extended metrics require domain-specific logging. `profile="full"` silently skips metrics whose required fields are absent.
+        Extended metrics require domain-specific logging. Since 0.3.0, a metric whose required fields are absent, or that is undefined (e.g. precision with no positive predictions), is `None` rather than `0.0`, and a warning names it. Decisions without labels are excluded from accuracy rather than counted as errors.
 
 ## EL baseline
 

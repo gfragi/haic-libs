@@ -72,7 +72,7 @@ print(result.get("warnings", []))
 # ["EL not computed: no task baseline provided (pass baseline_s, in seconds)."]
 ```
 
-Pass `profile="full"` to include outcome-based metrics if your decisions carry `correct` and/or `prediction` / `ground_truth` fields.
+Pass `profile="full"` to include outcome-based metrics (accuracy, precision, recall, F1, agreement) if your decisions carry `prediction` / `ground_truth` fields, and a trust score if they carry `trust_rating` / `trust_scale_maximum`. Metrics whose fields are absent are `None`. (`correct` feeds the core `Tr` metric.)
 
 ## Step 5 — Generate a report
 
