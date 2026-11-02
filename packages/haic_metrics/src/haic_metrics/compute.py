@@ -110,6 +110,7 @@ def compute_metrics(
     out: JsonDict = {
         "metrics": metrics,
         "window_summary": window_summary,
+        "rt_max_s": rt_max_s,
     }
 
     if include_warnings:

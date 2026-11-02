@@ -95,7 +95,9 @@ print(haic_metrics.report("haic_decisions_xxx.json"))
 ```
 
 `report()` loads the artifact, computes all core KPIs, and returns a
-ready-to-print Markdown evaluation report.
+ready-to-print Markdown evaluation report. Pass `fmt="json"` for a
+machine-readable report, and `rt_max_s=` to change the HCL normalisation
+(default 60 s).
 
 ---
 
@@ -154,9 +156,9 @@ print(haic_metrics.report(artifact_path))
 
 | Function | Description |
 | --- | --- |
-| `haic_metrics.report(path, *, profile, **kw)` | Full pipeline: load → compute → render Markdown report |
-| `haic_metrics.compute_metrics(artifact, *, profile, baseline_s, window)` | Compute KPIs from a loaded artifact dict or decisions list |
-| `haic_metrics.compute_metrics_from_file(path, *, profile, baseline_s, window)` | Load artifact from file and compute KPIs |
+| `haic_metrics.report(path, *, profile, rt_max_s, baseline_s, window, fmt)` | Full pipeline: load → compute → render a Markdown (`fmt="md"`) or JSON (`fmt="json"`) report |
+| `haic_metrics.compute_metrics(artifact, *, profile, rt_max_s, baseline_s, window)` | Compute KPIs from a loaded artifact dict or decisions list |
+| `haic_metrics.compute_metrics_from_file(path, *, profile, rt_max_s, baseline_s, window)` | Load artifact from file and compute KPIs |
 | `haic_metrics.render_markdown_report(*, result, artifact, ...)` | Render a Markdown report from a pre-computed result dict |
 
 Key `compute_metrics` behaviours:

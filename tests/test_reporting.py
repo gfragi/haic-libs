@@ -64,3 +64,62 @@ def test_markdown_report_golden_structure():
     assert "## Reproducibility" in md
     assert "artifact:" in md.lower()
     assert "haic-metrics" in md.lower()
+
+# ---- v0.3.0: report(rt_max_s=..., fmt=...), schema version line ----
+
+import json
+
+import pytest
+
+import haic_metrics
+
+
+def _write_artifact(tmp_path):
+    t0 = 1_700_000_000
+    artifact = {
+        "artifact_schema": "haic.decisions_artifact.v1",
+        "schema_version": "haic.decisions.v1",
+        "run_id": "run-test",
+        "session_id": "sess-test",
+        "meta": {"pilot_tag": "unit", "ai_system": {"model_name": "toy-llm"}},
+        "decisions": [
+            {"timestamp": t0, "actor_type": "human", "action": "query", "duration_s": 20.0, "correct": True},
+            {"timestamp": t0 + 5, "actor_type": "ai", "action": "respond", "latency_ms": 900, "correct": True},
+            {"timestamp": t0 + 30, "actor_type": "human", "action": "query", "duration_s": 40.0, "correct": False},
+            {"timestamp": t0 + 35, "actor_type": "ai", "action": "respond", "latency_ms": 1100, "correct": False},
+        ],
+    }
+    path = tmp_path / "haic_decisions_test.json"
+    path.write_text(json.dumps(artifact))
+    return path
+
+
+
+
+def test_report_rt_max_s_is_passed_through(tmp_path):
+    path = _write_artifact(tmp_path)
+    j60 = json.loads(haic_metrics.report(path, fmt="json"))
+    j30 = json.loads(haic_metrics.report(path, fmt="json", rt_max_s=30.0))
+    assert j60["parameters"]["rt_max_s"] == 60.0
+    assert j30["parameters"]["rt_max_s"] == 30.0
+    direct = haic_metrics.compute_metrics(haic_metrics.load_decisions_artifact(path), rt_max_s=30.0)
+    assert j30["metrics"]["HCL"] == pytest.approx(direct["metrics"]["HCL"])
+    assert j30["metrics"]["HCL"] != pytest.approx(j60["metrics"]["HCL"])
+    assert "rt_max=30.0s" in haic_metrics.report(path, rt_max_s=30.0)
+
+
+def test_json_report_structure(tmp_path):
+    j = json.loads(haic_metrics.report(_write_artifact(tmp_path), fmt="json", profile="full"))
+    assert j["run_id"] == "run-test"
+    assert j["parameters"]["profile"] == "full"
+    assert j["reproducibility"]["artifact_schema"] == "haic.decisions_artifact.v1"
+    assert j["reproducibility"]["schema_version"] == "haic.decisions.v1"
+    assert j["reproducibility"]["haic_metrics_version"] == haic_metrics.__version__
+    assert j["metrics"]["Tr"] == pytest.approx(0.5)
+    assert j["metrics"]["outcome_f1"] is None
+    assert isinstance(j["warnings"], list)
+
+
+def test_report_rejects_unknown_fmt(tmp_path):
+    with pytest.raises(ValueError):
+        haic_metrics.report(_write_artifact(tmp_path), fmt="html")

@@ -61,6 +61,8 @@ def render_markdown_report(
     repl("{{ diag.n_ai }}", n_ai)
 
     repl("{{ artifact_path }}", artifact_path)
+    repl("{{ artifact_schema }}", artifact.get("artifact_schema", "n/a"))
+    repl("{{ schema_version }}", artifact.get("schema_version", "n/a"))
     repl("{{ version_metrics }}", version_metrics)
     repl("{{ version_logging }}", version_logging)
     repl(
