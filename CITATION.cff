@@ -15,6 +15,7 @@ abstract: >-
 authors:
   - given-names: George
     family-names: Fragiadakis
+    orcid: "https://orcid.org/0000-0002-3418-6443"
     affiliation: >-
       Department of Informatics and Telematics, Harokopio University of Athens
 version: 0.3.0
