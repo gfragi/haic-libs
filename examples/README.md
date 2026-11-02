@@ -19,3 +19,12 @@ python examples/<script>.py
 4. Calls `haic_metrics.report()` — the one-liner that loads the artifact, computes all KPIs, and returns a ready-to-print Markdown report.
 
 **Good starting point for:** RAG chatbots, annotation tools, any application where a human and an AI take turns acting on shared objects.
+
+---
+
+## Full RAG chatbot (separate repository)
+
+The complete RAG chatbot used in the paper's demonstration, with its evaluation
+sessions and the scripts that recompute its results, lives in
+[gfragi/haic-libs-rag-replication](https://github.com/gfragi/haic-libs-rag-replication).
+It installs `haic-metrics` and `haic-logging` from PyPI, like any other application.
