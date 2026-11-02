@@ -1,3 +1,4 @@
+import re
 from datetime import datetime, timezone
 from haic_metrics.reporting.templates import REPORT_MD_TEMPLATE
 
@@ -19,16 +20,35 @@ def render_markdown_report(
     # Simple replacements (no templating engine needed yet)
     md = REPORT_MD_TEMPLATE
 
+    # Conditional list blocks first, so their {{ this }} placeholders are not shared
+    notes = window.get("notes") or []
+    md = re.sub(
+        r"\{\{#if window\.notes\}\}.*?\{\{/if\}\}\n",
+        lambda _: ("**window notes**\n" + "".join(f"- {n}\n" for n in notes)) if notes else "",
+        md,
+        count=1,
+        flags=re.S,
+    )
+    md = re.sub(
+        r"\{\{#if warnings\}\}.*?\{\{/if\}\}",
+        lambda _: "\n".join(f"- {w}" for w in warnings) if warnings else "- None",
+        md,
+        count=1,
+        flags=re.S,
+    )
+
     def repl(key, value):
         nonlocal md
         md = md.replace(key, "n/a" if value is None else str(value))
 
-    repl("{{ run_id }}", meta.get("run_id", "n/a"))
-    repl("{{ session_id }}", meta.get("session_id", "n/a"))
+    # run_id / session_id are top-level in haic.decisions_artifact.v1; meta kept as fallback
+    repl("{{ run_id }}", artifact.get("run_id") or meta.get("run_id", "n/a"))
+    repl("{{ session_id }}", artifact.get("session_id") or meta.get("session_id", "n/a"))
     repl("{{ pilot_tag }}", meta.get("pilot_tag", "n/a"))
     repl("{{ app_mode }}", meta.get("application", {}).get("mode", "n/a"))
-    repl("{{ model_name }}", meta.get("ai_system", {}).get("name", "n/a"))
-    repl("{{ model_version }}", meta.get("ai_system", {}).get("version", "n/a"))
+    ai_system = meta.get("ai_system", {})
+    repl("{{ model_name }}", ai_system.get("model_name") or ai_system.get("name", "n/a"))
+    repl("{{ model_version }}", ai_system.get("model_version") or ai_system.get("version", "n/a"))
 
     repl("{{ window.basis }}", window.get("basis", "n/a"))
     repl("{{ window.requested }}", window.get("requested", {}))
@@ -69,14 +89,5 @@ def render_markdown_report(
     "{{ generated_at }}",
     datetime.now(timezone.utc).isoformat()
 )
-
-    # Warnings block (simple)
-    if warnings:
-        md = md.replace("{{#if warnings}}", "").replace("{{/if}}", "")
-        md = md.replace("{{#each warnings}}", "").replace("{{/each}}", "")
-        md = md.replace("{{ this }}", "\n".join(f"- {w}" for w in warnings))
-    else:
-        md = md.replace("{{#if warnings}}", "").replace("{{/if}}", "")
-        md = md.replace("{{else}}", "").replace("- None", "- None")
 
     return md

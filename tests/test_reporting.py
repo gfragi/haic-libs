@@ -94,6 +94,11 @@ def _write_artifact(tmp_path):
     return path
 
 
+def test_markdown_report_states_schema_version_and_metadata(tmp_path):
+    md = haic_metrics.report(_write_artifact(tmp_path))
+    assert "decisions schema:** haic.decisions_artifact.v1 (schema_version: haic.decisions.v1)" in md
+    assert "**run_id:** run-test" in md
+    assert "**model:** toy-llm" in md
 
 
 def test_report_rt_max_s_is_passed_through(tmp_path):
@@ -123,3 +128,25 @@ def test_json_report_structure(tmp_path):
 def test_report_rejects_unknown_fmt(tmp_path):
     with pytest.raises(ValueError):
         haic_metrics.report(_write_artifact(tmp_path), fmt="html")
+
+
+
+
+def test_markdown_report_has_no_unrendered_template_markup(tmp_path):
+    md = haic_metrics.report(_write_artifact(tmp_path))
+    assert "{{" not in md and "}}" not in md
+    warnings_section = md.split("### Warnings", 1)[1].split("## Reproducibility", 1)[0]
+    assert "- EL not computed" in warnings_section
+    assert "- - " not in md
+    assert "- None" not in warnings_section
+
+
+def test_markdown_report_renders_window_notes():
+    result = {"metrics": {}, "window_summary": {"notes": ["start_time missing; used first decision"]}, "warnings": []}
+    md = render_markdown_report(
+        result=result, artifact={"decisions": []}, artifact_path="x.json",
+        version_metrics="0.3.0", version_logging="0.1.0",
+    )
+    assert "**window notes**\n- start_time missing; used first decision\n" in md
+    assert md.split("### Warnings", 1)[1].split("## Reproducibility", 1)[0].strip() == "- None"
+    assert "{{#" not in md and "{{/" not in md
