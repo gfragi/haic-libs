@@ -279,27 +279,20 @@ def compute_metrics(
     durs = _durations(agent_rows)
     D = _mean(durs)
 
-    # 3) HCL: prefer human agent rows; fallback to agent rows
+    # 3) HCL: mean human response time against rt_max, from human rows only.
     # Human rows without any timing (duration_s and latency_ms both None) are
-    # skipped; previously latency_ms=None raised TypeError here.
+    # skipped (previously latency_ms=None raised TypeError here). When no human
+    # row has timing, HCL is None: AI or other durations are not substituted.
     human_rts = _durations([
         e for e in agent_rows
         if str(e.get("actor_type", "")).lower() == "human" or str(e.get("agent", "")).upper().startswith("H")
     ])
-    latencies_s = [
-        float(e.get("latency_ms", 0.0)) / 1000.0
-        for e in agent_rows
-        if e.get("latency_ms") is not None
-    ]
+    HCL = None
+    HCL_note = None
     if human_rts:
-        mean_rt = _mean(human_rts)
-    elif durs:
-        mean_rt = _mean(durs)
-    elif latencies_s:
-        mean_rt = _mean(latencies_s)
+        HCL = _clip01(1.0 - (_mean(human_rts) / rt_max if rt_max > 0 else 1.0))
     else:
-        mean_rt = rt_max if rt_max > 0 else 1.0
-    HCL = _clip01(1.0 - (mean_rt / rt_max if rt_max > 0 else 1.0))
+        HCL_note = "no human decisions with timing (duration_s or latency_ms); HCL not computable"
 
     # 4) Tr: only score rows that are explicitly labeled OR explicit error events
     labeled = 0
@@ -395,7 +388,7 @@ def compute_metrics(
     out = {
         "F": float(F),
         "D": float(D),
-        "HCL": float(HCL),
+        "HCL": _f(HCL),
         "Tr": _f(Tr),
         "A": _f(A),
         "S": _f(S),
@@ -404,6 +397,8 @@ def compute_metrics(
     }
     if Tr_note:
         out["Tr_note"] = Tr_note
+    if HCL_note:
+        out["HCL_note"] = HCL_note
     if A_note:
         out["A_note"] = A_note
     if S_note:
