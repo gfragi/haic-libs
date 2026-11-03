@@ -33,6 +33,24 @@ To cut a new release:
 
 ---
 
+## [v0.3.1] – 2026-11-03
+
+### Fixed
+
+- `HCL` is computed from human decisions with timing only, as defined
+  (1 − mean human response time / `rt_max_s`). When no human decision carries
+  `duration_s` or `latency_ms`, `HCL` is now `None` with an `HCL_note`;
+  0.3.0 fell back to the durations of all decisions (mostly AI latencies),
+  or returned 0.0 when no decision had timing. Values are unchanged whenever
+  at least one human decision is timed.
+
+### Added
+
+- Tests for `HCL` without human timing, without human decisions, and with
+  `duration_s = 0.0` (a logged timing, not a missing one).
+
+---
+
 ## [v0.3.0] – 2026-11-02
 
 ### Changed (behaviour)
@@ -236,7 +254,8 @@ To cut a new release:
 ---
 
 
-[Unreleased]: https://github.com/gfragi/haic-libs/compare/v0.3.0...HEAD
+[Unreleased]: https://github.com/gfragi/haic-libs/compare/v0.3.1...HEAD
+[v0.3.1]: https://github.com/gfragi/haic-libs/compare/v0.3.0...v0.3.1
 [v0.3.0]: https://github.com/gfragi/haic-libs/compare/v0.2.1...v0.3.0
 [v0.2.1]: https://github.com/gfragi/haic-libs.git/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/gfragi/haic-libs.git/compare/v0.1.2...v0.2.0

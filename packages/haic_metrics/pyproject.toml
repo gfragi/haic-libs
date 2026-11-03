@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "haic-metrics"
-version = "0.3.0"
+version = "0.3.1"
 description = "Metrics computation for Human–AI Collaboration evaluation"
 readme = "README.md"
 requires-python = ">=3.10"

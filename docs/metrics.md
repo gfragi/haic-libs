@@ -20,7 +20,8 @@
         **High HCL = low cognitive load = good.**  
         **Low HCL = high cognitive load = bad.**  
         HCL=1.0 means the human reacted instantly (minimal load). HCL=0.0 means they
-        took the maximum expected time (maximum load). See the
+        took the maximum expected time (maximum load). HCL is `None` when no human
+        decision carries timing (`duration_s` or `latency_ms`). See the
         [Interpretation guide](interpretation.md#hcl--human-centeredness) for details.
 
     ## Human Effort & Responsiveness

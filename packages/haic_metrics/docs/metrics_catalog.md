@@ -8,7 +8,7 @@ This document catalogs the core metrics available in the HAIC evaluation framewo
 | ------------------------ | ------ | ---------------------------------------------------------- | --------------------------- | ------- |
 | Interaction Frequency    | F      | Rate of interaction events per unit time                   | `t`, `actor_type`, `action` | core    |
 | Mean Action Duration     | D      | Average duration of human or system actions                | `duration_s`                | core    |
-| Human-Centeredness       | HCL    | Normalized inverse human response time proxy               | `duration_s`                | core    |
+| Human-Centeredness       | HCL    | Normalized inverse human response time proxy (`None` if no human decision is timed) | `duration_s`                | core    |
 | Trust / Quality Proxy    | Tr     | Proxy trust measure derived from error or abstention rates | `correct` or error flags    | core    |
 | Efficiency / Effort Loss | EL     | Relative effort compared to baseline                       | `duration_s`, baseline      | core    |
 | Efficiency Score         | —      | Composite score incorporating effort and penalties         | derived                     | core    |

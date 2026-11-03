@@ -157,3 +157,33 @@ def test_human_row_without_timing_does_not_crash():
                  "timestamp": T0 + 96, "duration_s": None, "latency_ms": None})
     m = _m(rows, rt_max_s=20.0, baseline_s=50.0)["metrics"]
     assert m["HCL"] == pytest.approx(0.75)
+
+
+def test_hcl_none_without_human_timing():
+    # No human row carries timing: HCL is not computable and must not fall
+    # back to AI latencies (0.3.0 used them and reported 0.95 here).
+    rows = _fixture()
+    for r in rows:
+        if r["actor_type"] == "human":
+            r["duration_s"] = None
+    m = _m(rows, rt_max_s=20.0, baseline_s=50.0)["metrics"]
+    assert m["HCL"] is None
+    assert "HCL not computable" in m["HCL_note"]
+    assert m["Tr"] is not None  # other metrics are unaffected
+
+
+def test_hcl_none_without_human_rows():
+    rows = [r for r in _fixture() if r["actor_type"] == "ai"]
+    m = _m(rows, rt_max_s=20.0, baseline_s=50.0)["metrics"]
+    assert m["HCL"] is None
+
+
+def test_hcl_zero_human_duration_is_timing():
+    # duration_s = 0.0 is a logged (if implausible) timing, not missing timing
+    rows = _fixture()
+    for r in rows:
+        if r["actor_type"] == "human":
+            r["duration_s"] = 0.0
+    m = _m(rows, rt_max_s=20.0, baseline_s=50.0)["metrics"]
+    assert m["HCL"] == pytest.approx(1.0)
+    assert "HCL_note" not in m

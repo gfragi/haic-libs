@@ -173,6 +173,9 @@ Key `compute_metrics` behaviours:
 - **A / S**: return `None` (not `0.0`) when their inputs are absent (no labels in the
   early/late windows for A; no surrogate probabilities or actions for S), with
   `A_note` / `S_note` explaining why.
+- **HCL**: computed from human decisions with `duration_s` or `latency_ms` only;
+  `None` (with `HCL_note`) when no human decision is timed. AI latencies are
+  never substituted.
 - **Tr**: returns `None` (not `1.0`) when no decisions carry a `correct` label,
   making the metric's absence explicit. A `Tr_note` key explains the status.
 - **Windowing**: pass `window={"basis": "relative", "last": 120}` to restrict
